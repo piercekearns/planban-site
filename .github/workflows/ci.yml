@@ -1,0 +1,72 @@
+name: Website CI
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: planban-site-production
+  cancel-in-progress: false
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  site-preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and audit website
+        run: npm run site:preflight
+        env:
+          PLANBAN_SITE_COMMIT: ${{ github.sha }}
+
+  deploy-production:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: site-preflight
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and audit exact production commit
+        run: npm run site:preflight
+        env:
+          PLANBAN_SITE_COMMIT: ${{ github.sha }}
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist/site --project-name=planban-public-website --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify production commit
+        run: npm run site:verify-production
+        env:
+          PLANBAN_SITE_EXPECTED_COMMIT: ${{ github.sha }}
