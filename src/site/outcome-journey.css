@@ -1,0 +1,127 @@
+/* Outcome journey: one Item followed from scoped to complete, drawn with the same card the demo board uses. */
+.pb-journey {
+  --lv-bg: #f6f7f4; --lv-surface: #ffffff; --lv-ink: #101111; --lv-muted: #5d635f; --lv-faint: rgba(16, 17, 17, 0.5);
+  --lv-line: rgba(16, 17, 17, 0.1); --lv-colh: #eef0ec; --lv-blue: #0169cc; --lv-green: #00a240; --lv-group: #7c5cf5;
+  display: block;
+  margin-top: 40px;
+  text-align: left;
+}
+
+.pb-site.dark .pb-journey {
+  --lv-bg: #181818; --lv-surface: #212121; --lv-ink: #f2f2f2; --lv-muted: #b3b3b3; --lv-faint: rgba(242, 242, 242, 0.45);
+  --lv-line: rgba(255, 255, 255, 0.1); --lv-colh: #282828; --lv-blue: #339cff; --lv-green: #3ccf6e; --lv-group: #a58cff;
+}
+
+.pb-journey-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  font-size: 15px;
+  color: var(--pb-ink);
+}
+.pb-journey-item-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--pb-muted); font-weight: 650; }
+.pb-journey-item strong { font-weight: 650; }
+.pb-journey-item em { font-style: normal; font-size: 11px; border: 1px solid var(--pb-line-strong); border-radius: 5px; padding: 1px 6px; color: var(--pb-muted); }
+
+.pb-journey-track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  position: relative;
+}
+
+.pb-journey-track::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 11px;
+  height: 1px;
+  background: var(--pb-line-strong);
+}
+
+.pb-journey-stage { display: grid; gap: 10px; align-content: start; min-width: 0; position: relative; }
+
+.pb-journey-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--pb-ink);
+  background: var(--pb-bg);
+  width: fit-content;
+  padding-right: 8px;
+  position: relative;
+}
+
+.pb-site.dark .pb-journey-head { background: #0b0c0c; }
+.pb-journey-head strong { font-weight: 650; }
+
+.pb-journey-actor {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pb-journey-actor.agent { color: var(--pb-codex-bright); background: color-mix(in oklab, var(--pb-codex) 16%, transparent); }
+.pb-journey-actor.you { color: #ffb37a; background: rgba(217, 119, 87, 0.18); }
+
+.pb-journey .pb-live-card { padding: 11px 12px 13px; gap: 7px; min-height: 0; }
+.pb-journey .pb-live-card .s { font-size: 12.5px; line-height: 1.4; }
+.pb-journey .pb-live-card .s.owner { color: var(--lv-ink); }
+
+.pb-journey-status {
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lv-muted);
+  background: var(--lv-colh);
+  border-radius: 5px;
+  padding: 3px 7px;
+}
+
+.pb-journey-status.s-in-progress { color: var(--lv-blue); }
+.pb-journey-status.s-complete { color: var(--lv-green); }
+.pb-journey-stage.is-done .pb-live-card { opacity: 0.86; }
+
+.pb-journey-caption { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--pb-muted); }
+
+.pb-journey-note {
+  margin: 30px 0 0;
+  max-width: 760px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--pb-muted);
+}
+
+.pb-journey-note strong { color: var(--pb-ink); font-weight: 600; }
+
+@media (max-width: 1100px) {
+  .pb-journey-track { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pb-journey-track::before { display: none; }
+}
+
+@media (max-width: 640px) {
+  .pb-journey-track { grid-template-columns: minmax(0, 1fr); }
+}
+
+.pb-site.dark .pb-journey .pb-live-card { --lv-accent: #339cff; }
+.pb-outcomes .pb-section-heading > p { max-width: 720px; }
+
+/* Features: let the board visual fill the height of the three cards */
+.pb-demo-grid { align-items: stretch; }
+.pb-demo-grid .pb-demo-frame { display: flex; }
+.pb-demo-grid .pb-demo-frame .pb-screen-shell.large { flex: 1; aspect-ratio: auto; min-height: 420px; display: flex; flex-direction: column; }
+.pb-demo-grid .pb-screen-shell.large > * { flex: 1; }

@@ -1,5 +1,7 @@
 import { type CSSProperties, type FormEvent, type PointerEvent, useEffect, useRef, useState } from "react";
 import { ArrowUp, Menu } from "lucide-react";
+import { DemoBoard, DemoItemDetail, HeroLiveDemo } from "./HeroLiveDemo";
+import { OutcomeJourney } from "./OutcomeJourney";
 const planbanLogoImages = {
   light: "/assets/card-stack-black.svg",
   dark: "/assets/card-stack-white.svg"
@@ -70,30 +72,31 @@ const planbanYouTubeUrl = import.meta.env.VITE_PLANBAN_YOUTUBE_URL as string | u
 const themeStorageKey = "planban-public-theme";
 const isThemeMode = (value: unknown): value is "system" | "light" | "dark" => value === "system" || value === "light" || value === "dark";
 const installPrompt = "Install Planban from piercekearns/planban. Follow the Install With Codex details in the public GitHub README exactly, verify the plugin and MCP tools work, open the interactive tutorial in the Codex in-app browser, then ask whether I want to set up Planban for a local project.";
+const claudeInstallPrompt = "Install Planban from piercekearns/planban. Follow the Install With Claude Code details in the public GitHub README exactly, verify the plugin and MCP tools work, open the interactive tutorial in the browser pane, then ask whether I want to set up Planban for a local project.";
 const codexInstallUrl = `codex://new?prompt=${encodeURIComponent(installPrompt)}&originUrl=${encodeURIComponent("https://github.com/piercekearns/planban")}`;
 const typedInstallCommand = "/planban";
 const installProofSteps = [{
-  title: "Ask Codex to set it up",
-  copy: "One prompt installs Planban and opens the interactive tutorial."
+  title: "Ask your agent to set it up",
+  copy: "One prompt installs Planban and opens the interactive tutorial, in Codex or Claude."
 }, {
   title: "Open the board from any thread",
-  copy: "Type /planban to bring the board to any thread."
+  copy: "Type /planban in Codex, or /planban:pb in Claude Code, to bring the board to any thread."
 }, {
   title: "Keep the work structured",
   copy: "Use Items for independent outcomes. Use Groups when several Items contribute to one larger outcome."
 }] as const;
 const demoShots = [{
-  title: "Work from the browser",
-  caption: "Planban lives in the Codex in-app browser. You and the agent can read and update the same board as decisions change.",
-  imageKey: "board"
+  title: "See the whole project",
+  caption: "The board opens beside your thread, in Codex and in Claude. Every Item and Group, its Status and priority, and who is working on what, in one view that stays current.",
+  visual: "board"
 }, {
-  title: "Bring it to every thread",
-  caption: "Open boards, create Items and Groups, launch the tutorial, or send feedback directly from Codex.",
+  title: "Steer from any thread",
+  caption: "Open the board, create Items and Groups, or point an agent at an Item with one slash command. The plan follows you between threads and between agents.",
   visual: "commands"
 }, {
-  title: "Shape each outcome together",
-  caption: "Open an Item or Group to review its context, edit its Spec or Plan, and keep its next action clear.",
-  imageKey: "cardDetail"
+  title: "Scope and document each outcome",
+  caption: "Open an Item to read the Spec your agent wrote, the Plan it is following, and the one next action that says what happens now and who does it.",
+  visual: "detail"
 }] as const;
 const sourceApps = [{
   name: "GitHub",
@@ -139,13 +142,13 @@ const sourceApps = [{
 }] as const;
 const underHoodItems = [{
   title: "CLI, API, and MCP",
-  copy: "The CLI gives agents stable local commands for setup, Status and Placement changes, Groups, Items, and documents. The API and MCP expose the same structured actions, so the UI is not the only way to manage the board."
+  copy: "The CLI gives agents stable local commands for setup, Status changes, moving Items into Groups, and documents. The API and MCP expose the same structured actions, so the UI is not the only way to manage the board."
 }, {
   title: "Local state",
   copy: "Repo discovery stays in `.planban/`; live board state stays on your device, readable and writable by you and local agents."
 }, {
-  title: "Thread handoff",
-  copy: "A Work Item can carry its board, Status, Spec, Plan, and next action into a new Codex thread. The agent can resume with the right planning context instead of rediscovering the project."
+  title: "Portable references",
+  copy: "Copy Reference puts one line on the clipboard: the Item's title and its planban: id. Paste it into any Codex or Claude thread and the agent resolves the board, Status, Spec, Plan, and next action instead of rediscovering the project."
 }] as const;
 const CodexIcon = () => <svg viewBox="0 0 100 100" aria-hidden="true">
     <path d="M83.7733 42.8087C84.6678 40.1149 84.9771 37.2613 84.6807 34.4385C84.3843 31.6156 83.489 28.8885 82.0544 26.4394C77.6908 18.8436 68.9203 14.9365 60.3548 16.7725C57.9831 14.1344 54.9591 12.1668 51.5864 11.0673C48.2137 9.96772 44.611 9.77498 41.1402 10.5084C37.6694 11.2418 34.4527 12.8755 31.8132 15.2455C29.1736 17.6155 27.204 20.6383 26.1024 24.0103C23.3212 24.5806 20.6938 25.738 18.3958 27.405C16.0977 29.0721 14.1819 31.2104 12.7765 33.6772C8.36538 41.2609 9.3669 50.8267 15.2527 57.3327C14.3549 60.0251 14.0424 62.8782 14.3361 65.7012C14.6298 68.5241 15.523 71.2518 16.9558 73.7017C21.325 81.3002 30.1011 85.207 38.6712 83.3686C40.5554 85.4904 42.8707 87.1858 45.4623 88.3416C48.0539 89.4975 50.8622 90.0871 53.6999 90.0713C62.4793 90.079 70.2575 84.4114 72.9393 76.0515C75.7201 75.4802 78.347 74.3225 80.6449 72.6555C82.9427 70.9886 84.8587 68.8507 86.2649 66.3846C90.6227 58.8145 89.6172 49.3005 83.7733 42.8087ZM53.6999 84.8356C50.1955 84.8411 46.801 83.6129 44.1116 81.3661L44.5848 81.098L60.5123 71.9043C60.9087 71.6718 61.2379 71.3402 61.4674 70.942C61.6969 70.5439 61.8189 70.0929 61.8215 69.6333V47.1769L68.5553 51.072C68.6225 51.1063 68.6694 51.1707 68.6814 51.2456V69.854C68.6641 78.1208 61.9667 84.8183 53.6999 84.8356ZM21.4977 71.0843C19.7402 68.0497 19.1092 64.4925 19.7156 61.0386L20.1885 61.3225L36.1321 70.5165C36.5266 70.748 36.9757 70.87 37.4331 70.87C37.8905 70.87 38.3396 70.748 38.7341 70.5165L58.21 59.2883V67.0628C58.2081 67.1031 58.1973 67.1424 58.1782 67.1779C58.1591 67.2134 58.1322 67.2441 58.0996 67.2678L41.9671 76.5722C34.798 80.7022 25.6388 78.2463 21.4977 71.0843ZM17.3026 36.3898C19.0723 33.3357 21.8655 31.0062 25.1878 29.8138V48.7376C25.1818 49.1949 25.2986 49.6453 25.5261 50.042C25.7535 50.4387 26.0833 50.7671 26.4809 50.9928L45.8622 62.1739L39.1283 66.069C39.0919 66.0883 39.0513 66.0984 39.0101 66.0984C38.9689 66.0984 38.9283 66.0883 38.8919 66.069L22.7908 56.7809C15.6359 52.6337 13.1822 43.4816 17.3026 36.3112V36.3898ZM72.624 49.2426L53.1792 37.9512L59.8976 34.0718C59.9341 34.0524 59.9747 34.0423 60.016 34.0423C60.0573 34.0423 60.0979 34.0524 60.1344 34.0718L76.2355 43.3761C78.6973 44.7966 80.7043 46.8882 82.0221 49.4065C83.3398 51.9249 83.914 54.7661 83.6775 57.5985C83.4411 60.431 82.4038 63.1377 80.6867 65.4027C78.9696 67.6677 76.6436 69.3975 73.9803 70.3901V51.466C73.9663 51.0096 73.834 50.5647 73.5962 50.1749C73.3584 49.7851 73.0234 49.4638 72.624 49.2426ZM79.3261 39.1657L78.8529 38.8815L62.9411 29.6089C62.5442 29.376 62.0924 29.2532 61.6322 29.2532C61.172 29.2532 60.7202 29.376 60.3233 29.6089L40.8629 40.8374V33.0628C40.8587 33.0233 40.8654 32.9834 40.882 32.9473C40.8987 32.9113 40.9248 32.8803 40.9575 32.8579L57.0586 23.5692C59.5263 22.1476 62.3478 21.458 65.193 21.5811C68.0382 21.7042 70.7896 22.6348 73.1253 24.2642C75.461 25.8936 77.2845 28.1543 78.3825 30.782C79.4806 33.4097 79.8077 36.2957 79.3257 39.1025V39.1657H79.3261ZM37.1888 52.9484L30.455 49.069C30.4213 49.0487 30.3925 49.0212 30.3707 48.9884C30.3488 48.9557 30.3345 48.9186 30.3286 48.8797V30.3188C30.3323 27.4714 31.1466 24.6839 32.6761 22.2822C34.2057 19.8805 36.3874 17.9639 38.9661 16.7564C41.5448 15.549 44.4139 15.1005 47.2381 15.4636C50.0622 15.8267 52.7247 16.9862 54.9141 18.8067L54.4409 19.0748L38.5134 28.2686C38.117 28.5011 37.7879 28.8327 37.5584 29.2308C37.329 29.629 37.207 30.0799 37.2045 30.5395L37.1888 52.9487V52.9484ZM40.8472 45.0632L49.5209 40.0643L58.21 45.0635V55.0615L49.5523 60.0608L40.8632 55.0615L40.8472 45.0632Z" fill="currentColor" />
@@ -179,6 +182,25 @@ const AgentLogo = ({
   loading?: "eager" | "lazy";
 }) => <img src={src} alt="" aria-hidden="true" className="pb-agent-logo" data-agent={label} loading={loading} decoding="async" />;
 const CodexInstallIcon = () => <AgentLogo src={agentLogoImages.codex} label="codex" />;
+const ClaudeInstallIcon = () => <svg viewBox="0 0 100 100" aria-hidden="true" className="pb-agent-logo pb-claude-glyph">
+    <circle cx="50" cy="50" r="50" fill="#ffffff" />
+    <g transform="translate(50 50) scale(0.6) translate(-50 -50)" fill="#D97757"><path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z" /></g>
+  </svg>;
+const HostCtas = () => <>
+    <a className="pb-button primary pb-install-with-codex pb-desktop-codex-cta" href={codexInstallUrl}>
+      <span className="pb-button-icon"><CodexInstallIcon /></span>
+      Install with Codex
+    </a>
+    <a className="pb-button pb-install-with-claude pb-desktop-codex-cta" href="#install" onClick={() => window.dispatchEvent(new CustomEvent("planban:host", { detail: "claude" }))}>
+      <span className="pb-button-icon"><ClaudeInstallIcon /></span>
+      Install with Claude
+    </a>
+    <button type="button" className="pb-button primary pb-install-with-codex pb-mobile-codex-cta" aria-disabled="true" tabIndex={-1}>
+      <span className="pb-button-icon"><CodexInstallIcon /></span>
+      Install with Codex
+    </button>
+    <span className="pb-install-mobile-note">Desktop only. Works with Codex and Claude.</span>
+  </>;
 const GlobeIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
     <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
@@ -187,21 +209,29 @@ const GlobeIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" 
 const ChevronIcon = () => <svg className="pb-chevron" viewBox="0 0 24 24" aria-hidden="true">
     <path d="M6.47 9.47a.75.75 0 0 1 1.06 0L12 13.94l4.47-4.47a.75.75 0 1 1 1.06 1.06l-5 5a.75.75 0 0 1-1.06 0l-5-5a.75.75 0 0 1 0-1.06Z" fill="currentColor" />
   </svg>;
-const futurePlatforms = [{
-  title: "Claude Code",
-  copy: "Bring the same human-agent roadmap, specs, plans, and handoff context into Claude-native software workflows.",
+const hostPlatforms = [{
+  title: "Codex desktop",
+  status: "Available",
+  tone: "ok",
+  copy: "Board in the in-app browser. /pb, /planban, /planban-create.",
+  icon: <AgentLogo src={agentLogoImages.codex} label="codex" loading="lazy" />
+}, {
+  title: "Claude Code desktop",
+  status: "Available",
+  tone: "ok",
+  copy: "Board in the browser pane. /planban:pb and friends.",
   icon: <AgentLogo src={agentLogoImages.claude} label="claude" loading="lazy" />
 }, {
-  title: "Cursor",
-  copy: "Keep work context and implementation plans close to the editor when the work moves into Cursor.",
-  icon: <AgentLogo src={agentLogoImages.cursor} label="cursor" loading="lazy" />
+  title: "Any MCP host",
+  status: "Via MCP",
+  tone: "neutral",
+  copy: "Same tools; the board opens as a link. Cursor and others fit here.",
+  icon: <span className="pb-platform-text-icon" aria-hidden="true">MCP</span>
 }, {
-  title: "T3 Code",
-  copy: "Carry Planban's agent-readable Items, Groups, and Specs into T3-style app work where product context and implementation move together.",
-  icon: <AgentLogo src={agentLogoImages.t3} label="t3" loading="lazy" />
-}, {
-  title: "Hosted web",
-  copy: "Share a browser workspace for teams, collaborators, and clients who need visibility without local setup.",
+  title: "Online Mode",
+  status: "In design",
+  tone: "neutral",
+  copy: "Remote access to your own board. Local Mode stays complete and permanent.",
   icon: <GlobeIcon />
 }] as const;
 const PlanbanMark = ({
@@ -241,11 +271,15 @@ const SlashCommandMockup = ({
 }: {
   theme: "light" | "dark";
 }) => <div className="pb-command-mockup">
+    <div className="pb-command-hosts" aria-hidden="true">
+      <span className="active"><img src={agentLogoImages.codex} alt="" />Codex · /pb</span>
+      <span><img src={agentLogoImages.claude} alt="" />Claude · /planban:pb</span>
+    </div>
     <div className="pb-command-menu glass">
       {["Planban", "Planban Help", "Planban Create", "Planban Feedback", "Planban Tutorial"].map((label, index) => <div className={`pb-command-row ${index === 0 ? "active" : ""}`} key={label}>
           <span className="pb-mini-mark"><img src={planbanLogoImages[theme]} alt="" loading="lazy" decoding="async" /></span>
           <strong>{label}</strong>
-          <span>{["Open a Planban board in Codex", "Show Planban actions and reopen tutorial/help", "Create boards, Items, or Groups from rough notes", "Package Planban bug reports and product feedback", "Open the interactive Planban tutorial"][index]}</span>
+          <span>{["Open the Planban board beside this thread", "Show Planban actions and reopen tutorial/help", "Create boards, Items, or Groups from rough notes", "Package Planban bug reports and product feedback", "Open the interactive Planban tutorial"][index]}</span>
           <small>Personal</small>
         </div>)}
     </div>
@@ -367,7 +401,7 @@ const BringPlansVisual = ({
   theme: "light" | "dark";
 }) => <div className="pb-context-visual glass">
     <svg className="pb-context-lines" viewBox="0 0 760 460" preserveAspectRatio="none" aria-hidden="true">
-      {["M110 136 V156 Q110 164 118 164 H224 Q232 164 232 172 V204 Q232 212 240 212 H284", "M290 136 V156 Q290 164 298 164 H338 Q346 164 346 172 V188", "M470 136 V156 Q470 164 462 164 H422 Q414 164 414 172 V188", "M650 136 V156 Q650 164 642 164 H536 Q528 164 528 172 V204 Q528 212 520 212 H476", "M110 324 V304 Q110 296 118 296 H224 Q232 296 232 288 V256 Q232 248 240 248 H284", "M290 324 V304 Q290 296 298 296 H338 Q346 296 346 288 V272", "M470 324 V304 Q470 296 462 296 H422 Q414 296 414 288 V272", "M650 324 V304 Q650 296 642 296 H536 Q528 296 528 288 V256 Q528 248 520 248 H476"].map(path => <path key={path} d={path} />)}
+      {["M110 136 V156 Q110 164 118 164 H224 Q232 164 232 172 V204 Q232 212 240 212 H350", "M290 136 V156 Q290 164 298 164 H338 Q346 164 346 172 V200", "M470 136 V156 Q470 164 462 164 H422 Q414 164 414 172 V200", "M650 136 V156 Q650 164 642 164 H536 Q528 164 528 172 V204 Q528 212 520 212 H410", "M110 324 V304 Q110 296 118 296 H224 Q232 296 232 288 V256 Q232 248 240 248 H350", "M290 324 V304 Q290 296 298 296 H338 Q346 296 346 288 V260", "M470 324 V304 Q470 296 462 296 H422 Q414 296 414 288 V260", "M650 324 V304 Q650 296 642 296 H536 Q528 296 528 288 V256 Q528 248 520 248 H410"].map(path => <path key={path} d={path} />)}
     </svg>
     <div className="pb-source-row top">
       {sourceApps.slice(0, 4).map(source => <span key={source.name} className="pb-source-icon" aria-label={source.name}>
@@ -376,13 +410,6 @@ const BringPlansVisual = ({
     </div>
     <div className="pb-context-hub">
       <span className="pb-context-core pb-context-planban"><PlanbanMark theme={theme} loading="lazy" /></span>
-      <span className="pb-exchange-wires" aria-hidden="true">
-        <svg viewBox="0 0 96 42">
-          <path d="M4 8 C28 8 34 21 48 21 C62 21 68 34 92 34" />
-          <path d="M4 34 C28 34 34 21 48 21 C62 21 68 8 92 8" />
-        </svg>
-      </span>
-      <span className="pb-context-core pb-context-codex"><AgentLogo src={agentLogoImages.codexMark} label="codex" loading="lazy" /></span>
     </div>
     <div className="pb-source-row bottom">
       {sourceApps.slice(4).map(source => <span key={source.name} className="pb-source-icon" aria-label={source.name}>
@@ -405,7 +432,7 @@ const PrivacyPolicyPage = ({
         <nav className="pb-nav glass" aria-label="Primary">
           <a href="/#install">Install</a>
           <a href="/#features">Features</a>
-          <a href="/#future">Future</a>
+          <a href="/#future">Hosts</a>
         </nav>
         <div className="pb-header-actions">
           <a className="pb-icon-button" href="https://github.com/piercekearns/planban" aria-label="Open Planban on GitHub">
@@ -458,6 +485,16 @@ export const PlanbanPublicWebsite = () => {
   const [email, setEmail] = useState("");
   const [signupState, setSignupState] = useState<"idle" | "success" | "error" | "unconfigured" | "submitting">("idle");
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
+  const [installHost, setInstallHost] = useState<"codex" | "claude">("codex");
+  const activeInstallPrompt = installHost === "claude" ? claudeInstallPrompt : installPrompt;
+  useEffect(() => {
+    const onHost = (event: Event) => {
+      const detail = (event as CustomEvent<"codex" | "claude">).detail;
+      if (detail === "codex" || detail === "claude") setInstallHost(detail);
+    };
+    window.addEventListener("planban:host", onHost);
+    return () => window.removeEventListener("planban:host", onHost);
+  }, []);
   const [headerVisible, setHeaderVisible] = useState(true);
   const [headerCompact, setHeaderCompact] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -867,7 +904,7 @@ export const PlanbanPublicWebsite = () => {
     }
   }
   async function copyInstallCommand() {
-    await copyTextToClipboard(installPrompt);
+    await copyTextToClipboard(activeInstallPrompt);
     setCopyState("copied");
     window.setTimeout(() => setCopyState("idle"), 1500);
   }
@@ -891,7 +928,8 @@ export const PlanbanPublicWebsite = () => {
           <nav className="pb-nav glass" aria-label="Primary">
             <a href="#install">Install</a>
             <a href="#features">Features</a>
-            <a href="#future">Future</a>
+            <a href="#loop">How it works</a>
+            <a href="#future">Hosts</a>
           </nav>
           <div className="pb-header-actions">
             <div className="pb-theme-toggle" role="group" aria-label="Theme">
@@ -905,6 +943,7 @@ export const PlanbanPublicWebsite = () => {
                 <MoonIcon />
               </button>
             </div>
+            <a className="pb-version-pill" href="https://github.com/piercekearns/planban/releases/tag/v1.1.6" aria-label="Planban v1.1.6 release notes">v1.1.6</a>
             <a className="pb-icon-button" href="https://github.com/piercekearns/planban" aria-label="Open Planban on GitHub">
               <GitHubIcon />
               <span>GitHub</span>
@@ -917,7 +956,7 @@ export const PlanbanPublicWebsite = () => {
             <p className="pb-kicker">Menu</p>
             <a href="#install" onClick={() => setMobileMenuOpen(false)}>Install</a>
             <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
-            <a href="#future" onClick={() => setMobileMenuOpen(false)}>Future</a>
+            <a href="#future" onClick={() => setMobileMenuOpen(false)}>Hosts</a>
             <span className="pb-menu-divider" aria-hidden="true" />
             <a href="#updates" onClick={() => setMobileMenuOpen(false)}>Keep up to date</a>
             <span className="pb-menu-divider" aria-hidden="true" />
@@ -946,53 +985,38 @@ export const PlanbanPublicWebsite = () => {
         <section className="pb-hero pb-band-neutral" data-ascii-zone="true">
           <div className="pb-hero-copy">
             <h1>
-              <span className="pb-hero-accent">Agent-native</span>{" "}
-              <span>Kanban board</span>{" "}
-              <span>that lives in your</span>{" "}
-              <span>Codex browser.</span>
+              <span>Your agents' plan,</span>{" "}
+              <span className="pb-hero-accent">in plain sight.</span>
             </h1>
             <p className="pb-lede">
-              Turn conversations into a shared roadmap. Keep Items, Groups, Specs, Plans, priorities, and next actions readable to you and your agent.
+              Give your agents real work: features, bugs, releases, research. Planban is the live board where they scope it, plan it, build it, and keep it current as they go, so you always see where every project is up to and what needs you.
             </p>
             <div className="pb-actions">
-              <a className="pb-button primary pb-install-with-codex pb-desktop-codex-cta" href={codexInstallUrl}>
-                <span className="pb-button-icon"><CodexInstallIcon /></span>
-                Install with Codex
-              </a>
-              <button type="button" className="pb-button primary pb-install-with-codex pb-mobile-codex-cta" aria-disabled="true" tabIndex={-1}>
-                <span className="pb-button-icon"><CodexInstallIcon /></span>
-                Install with Codex
-              </button>
-              <span className="pb-install-mobile-note">Desktop only</span>
+              <HostCtas />
             </div>
           </div>
 
           <div className="pb-hero-visual">
-            <div className="pb-hero-frame pb-hero-video-frame">
+            <div className="pb-hero-frame pb-hero-video-frame pb-hero-live-frame">
               <div className={`pb-hero-media ${resolvedTheme}`}>
-                <HeroDemoVideo theme={resolvedTheme} />
+                <HeroLiveDemo theme={resolvedTheme} hostLogos={{ codex: agentLogoImages.codex, claude: agentLogoImages.claude }} planbanMark={planbanLogoImages[resolvedTheme]} />
               </div>
             </div>
           </div>
         </section>
 
-        <section id="install" className="pb-install-focus pb-band-accent">
-          <div className="pb-install-copy">
-            <h2>Quick Start</h2>
-            <p>One-prompt install, one-click updates.</p>
-            <a className="pb-button primary pb-install-with-codex pb-desktop-codex-cta" href={codexInstallUrl}>
-              <span className="pb-button-icon"><CodexInstallIcon /></span>
-              Install with Codex
-            </a>
-            <button type="button" className="pb-button primary pb-install-with-codex pb-mobile-codex-cta" aria-disabled="true" tabIndex={-1}>
-              <span className="pb-button-icon"><CodexInstallIcon /></span>
-              Install with Codex
-            </button>
-            <span className="pb-install-mobile-note">Desktop only</span>
-          </div>
-        </section>
 
-        <section className="pb-install-proof pb-band-neutral" data-ascii-zone="true">
+        <section id="outcomes" className="pb-outcomes pb-section-full pb-band-neutral" data-ascii-zone="true">
+          <div className="pb-section-heading compact stacked">
+            <div>
+              <h2>Every Item, tracked as it happens.</h2>
+            </div>
+            <p>An Item is a feature, a bug, a release, a piece of research. Your agents scope it, plan it, build it, and keep its card current while they do. You see where it is and what needs you, the moment it changes.</p>
+          </div>
+          <OutcomeJourney />
+          <p className="pb-journey-note"><strong>Planban does not write the code or make the plan. Codex and Claude do.</strong> Planban is the always-accurate picture of that work, living beside you and your agents, kept true in real time.</p>
+        </section>
+        <section id="install" className="pb-install-proof pb-band-neutral" data-ascii-zone="true">
           <div className="pb-install-proof-grid">
             <div className="pb-install-proof-copy">
               <h2 className="pb-install-proof-title" aria-label="Prompt to install, /planban to open.">
@@ -1011,22 +1035,18 @@ export const PlanbanPublicWebsite = () => {
 
             <div className="pb-install-command-stack">
               <div className="pb-install-panel-cta">
-                <a className="pb-button primary pb-install-with-codex pb-desktop-codex-cta" href={codexInstallUrl}>
-                  <span className="pb-button-icon"><CodexInstallIcon /></span>
-                  Install with Codex
-                </a>
-                <button type="button" className="pb-button primary pb-install-with-codex pb-mobile-codex-cta" aria-disabled="true" tabIndex={-1}>
-                  <span className="pb-button-icon"><CodexInstallIcon /></span>
-                  Install with Codex
-                </button>
-                <span className="pb-install-mobile-note">Desktop only</span>
+                <HostCtas />
               </div>
               <div className="pb-or-divider"><span>or</span></div>
               <div className="pb-install-command-panel">
                 <div className="pb-terminal-card glass">
-                <div className="pb-prompt-label">Paste this to your agent:</div>
+                <div className="pb-host-toggle" role="group" aria-label="Choose your agent">
+                  <button type="button" className={installHost === "codex" ? "active" : ""} onClick={() => setInstallHost("codex")}><CodexInstallIcon />Codex</button>
+                  <button type="button" className={installHost === "claude" ? "active" : ""} onClick={() => setInstallHost("claude")}><ClaudeInstallIcon />Claude</button>
+                </div>
+                <div className="pb-prompt-label">Paste this to {installHost === "claude" ? "Claude" : "Codex"}:</div>
                 <div className="pb-code-box">
-                    <pre><span className="pb-command-full">{installPrompt}</span><span className="pb-command-preview" aria-hidden="true">{installPrompt}</span></pre>
+                    <pre><span className="pb-command-full">{activeInstallPrompt}</span><span className="pb-command-preview" aria-hidden="true">{activeInstallPrompt}</span></pre>
                     <button type="button" className={`pb-copy-icon ${copyState === "copied" ? "copied" : ""}`} onClick={copyInstallCommand} aria-label={`${copyState === "copied" ? "Copied" : "Copy"} Codex prompt`}>
                       {copyState === "copied" ? <CheckIcon /> : <CopyIcon />}
                       <span>{copyState === "copied" ? "Copied" : "Copy"}</span>
@@ -1041,14 +1061,14 @@ export const PlanbanPublicWebsite = () => {
         <section id="features" className="pb-demo pb-section-full pb-band-neutral" data-ascii-zone="true">
           <div className="pb-section-heading compact stacked">
             <div>
-              <h2>For every project, from any thread.</h2>
+              <h2>One board for the whole project.</h2>
             </div>
-            <p>Planban turns conversation into durable planning. Track independent outcomes as Items. Group related Items when they need one larger objective and their own internal priority list.</p>
+            <p>Every outcome is an Item with a Status, a summary, a next action, and its own Spec and Plan. Related Items become a Group whose progress you can read at a glance. Nothing lives only in a chat transcript.</p>
           </div>
           <div className="pb-demo-grid">
             <div className="pb-demo-frame pb-grid-frame pb-grid-frame-features">
               <div className="pb-screen-shell large">
-                {"visual" in selectedShot ? <SlashCommandMockup theme={resolvedTheme} /> : <img src={images[selectedShot.imageKey]} alt={selectedShot.title} width="1280" height="720" loading="lazy" decoding="async" />}
+                {selectedShot.visual === "commands" ? <SlashCommandMockup theme={resolvedTheme} /> : selectedShot.visual === "detail" ? <DemoItemDetail /> : <DemoBoard planbanMark={planbanLogoImages[resolvedTheme]} state={{ sceneOne: true, changed: true, working: false }} compact />}
               </div>
             </div>
             <div className="pb-demo-cards">
@@ -1061,13 +1081,38 @@ export const PlanbanPublicWebsite = () => {
           </div>
         </section>
 
+        <section id="loop" className="pb-loop pb-section-full pb-band-neutral" data-ascii-zone="true">
+          <div className="pb-section-heading compact stacked">
+            <div>
+              <h2>Talk to your agents. The board stays true.</h2>
+            </div>
+            <p>Your agents do the work. Planban keeps the picture true. Agents are trusted editors of the plan; you own intent, priority, and acceptance.</p>
+          </div>
+          <div className="pb-loop-grid">
+            <article className="pb-info-card glass">
+              <small className="pb-loop-step">You say</small>
+              <strong>"Build the GitHub import, then hand it back for my review."</strong>
+              <span>In Codex, in Claude, or in any MCP host. One sentence, no ticket to fill in.</span>
+            </article>
+            <article className="pb-info-card glass">
+              <small className="pb-loop-step">The agent does</small>
+              <strong>Scopes it, plans it, builds it, and keeps the card current as it goes.</strong>
+              <span>Spec, Plan, Status, summary, and next action, written by the agent, not by you.</span>
+            </article>
+            <article className="pb-info-card glass">
+              <small className="pb-loop-step">You see</small>
+              <strong>Where it is, what is stuck, and what needs your decision, live on the board.</strong>
+              <span>You steer from the board or the conversation. Only you mark work Complete.</span>
+            </article>
+          </div>
+        </section>
         <section id="context" className="pb-import-section pb-section-full pb-band-neutral" data-ascii-zone="true">
           <div className="pb-section-heading compact stacked">
             <div>
               <h2>Bring your plans where you work.</h2>
             </div>
             <p>
-              Start from repo docs, issues, Notion pages, Linear tickets, Jira work, copied notes, or a plain-language update. Ask Codex to turn that context into draft Planban Items and Groups. Review them before they become your working plan. No native integration is required.
+              Start from repo docs, issues, Notion pages, Linear tickets, Jira work, copied notes, or a plain-language update. Ask your agent to turn that context into draft Planban Items and Groups. Review them before they become your working plan. No native integration is required.
             </p>
           </div>
           <div className="pb-import-grid">
@@ -1077,8 +1122,8 @@ export const PlanbanPublicWebsite = () => {
                 <span>Turn scattered planning inputs into independent outcomes with clear titles, summaries, priorities, Specs, and next actions.</span>
               </article>
               <article className="pb-info-card glass">
-                <strong>Group related outcomes</strong>
-                <span>Create a Group when several Items contribute to one larger outcome. Each Item keeps its own Status, priority, documents, and history.</span>
+                <strong>Nothing lands until you approve it</strong>
+                <span>Drafts arrive as Pending Items with a summary and a proposed priority. Accept, edit, or discard them before they become the plan.</span>
               </article>
             </div>
             <BringPlansVisual theme={resolvedTheme} />
@@ -1089,7 +1134,7 @@ export const PlanbanPublicWebsite = () => {
           <div className="pb-section-copy wide">
             <h2>Local and agent-readable.</h2>
             <p>
-              Structured commands, a local API, MCP tools, and readable files support the same planning model. Use the board yourself or let an agent make the same changes through a supported interface.
+              Structured commands, a local API, MCP tools, and readable files support the same planning model. A drag on the board and a tool call from an agent run the same operation and write the same history.
             </p>
           </div>
           <div className="pb-underhood-list">
@@ -1106,14 +1151,15 @@ export const PlanbanPublicWebsite = () => {
         <div className="pb-future-footer-shell pb-band-accent">
           <section id="future" className="pb-future-full">
             <div className="pb-future-heading">
-              <h2>Coming Soon</h2>
-              <p>Planban starts in Codex.<br />Next: more native agent surfaces, shared web workspaces, accounts, and collaborative boards.</p>
+              <h2>Where it runs.</h2>
+              <p>Planban runs in Codex and Claude Code today, and any MCP host can use the same tools and open the board as a link. Online Mode, remote access to your own board, is in design.</p>
             </div>
             <div className="pb-platforms">
-              {futurePlatforms.map(platform => <article className="pb-platform-card" key={platform.title}>
+              {hostPlatforms.map(platform => <article className={`pb-platform-card tone-${platform.tone}`} key={platform.title}>
                   <span className="pb-platform-icon">{platform.icon}</span>
                   <strong>{platform.title}</strong>
-                  <small>Coming soon</small>
+                  <small>{platform.status}</small>
+                  <p>{platform.copy}</p>
                 </article>)}
             </div>
           </section>
@@ -1127,13 +1173,17 @@ export const PlanbanPublicWebsite = () => {
         <div className="pb-footer-links">
           <a href="#install">Install</a>
           <a href="#features">Features</a>
-          <a href="#future">Future</a>
+          <a href="#future">Hosts</a>
+          <a href="https://github.com/piercekearns/planban/releases">Changelog · v1.1.6</a>
+          <a href="https://github.com/piercekearns/planban/blob/main/PRODUCT.md">Product constitution</a>
           <a href="/privacy">Privacy</a>
+          <a href="https://github.com/piercekearns/planban/blob/main/LICENSE">MIT licence</a>
+          <a className="pb-footer-credit" href="https://backpacker.gr/fonts/">Hellenica by backpacker.gr</a>
         </div>
         <form onSubmit={submitSignup} className="pb-footer-signup glass">
           <div>
             <strong>Keep up to date</strong>
-            <p>Product notes, tutorial drops, and platform updates. GitHub remains the reliable install and update source.</p>
+            <p>Release notes and platform updates. GitHub remains the reliable install and update source.</p>
           </div>
           <div className="pb-signup-row">
             <input value={email} onChange={event => {

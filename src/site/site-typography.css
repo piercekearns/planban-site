@@ -1,0 +1,115 @@
+/* Variant C: Hellenica (the wordmark face) as the display font. Regular is the only weight installed, so headings use 400 and never synthesise bold. */
+/* Letters, digits, and plain punctuation come from Hellenica. Quotes, apostrophes, ?, !, &, @, # fall back to the system face, whose forms are conventional. The weight range stops the browser faux-bolding the single Hellenica weight. */
+@font-face {
+  font-family: "Hellenica";
+  src: url("/assets/fonts/Hellenica.otf?v=3") format("opentype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0028-002C, U+002E, U+0030-003E, U+0041-005A, U+0061-007A, U+00C0-024F, U+2026;
+}
+
+/* Variant B: display typography, the loop section, and a quieter rhythm. */
+.pb-site h1,
+.pb-site h2,
+.pb-site .pb-install-proof-title,
+.pb-site .pb-future-heading h2 {
+  font-family: "Hellenica", -apple-system, "SF Pro Display", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+.pb-site .pb-hero h1 {
+  font-size: clamp(38px, 4.6vw, 64px);
+  line-height: 1.04;
+  text-wrap: balance;
+  max-width: min(14ch, 100%);
+  max-width: 960px;
+}
+
+.pb-site .pb-hero-accent {
+  color: color-mix(in oklab, var(--pb-codex-bright) 78%, var(--pb-ink));
+}
+
+.pb-site .pb-lede {
+  max-width: 700px;
+  font-size: 19px;
+}
+
+.pb-site .pb-section-heading h2,
+.pb-site .pb-section-copy h2,
+.pb-site .pb-future-heading h2 {
+  letter-spacing: -0.025em;
+}
+
+.pb-site .pb-info-card strong {
+  font-family: "Hellenica", -apple-system, system-ui, sans-serif;
+  letter-spacing: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Loop section */
+.pb-loop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.pb-loop-grid .pb-info-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 170px;
+}
+
+.pb-loop-step {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--pb-codex-bright) 72%, var(--pb-muted));
+}
+
+.pb-loop-grid code,
+.pb-loop-ops code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--pb-line);
+  background: color-mix(in oklab, var(--pb-glass-strong) 80%, transparent);
+  color: var(--pb-ink);
+}
+
+.pb-loop-ops {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  font-size: 14px;
+  color: var(--pb-muted);
+}
+
+.pb-loop-ops code { padding: 6px 11px; border-radius: 999px; }
+
+@media (max-width: 980px) {
+  .pb-loop-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Phone: taller hero frame so the agent pane and board both fit; compact board shows one column */
+@media (max-width: 980px) {
+  .pb-hero-live-frame .pb-hero-media { aspect-ratio: 3 / 4; }
+  .pb-live { grid-template-rows: minmax(0, 0.46fr) minmax(0, 0.54fr); }
+  .pb-live-agent { max-height: none; }
+}
+@media (max-width: 640px) {
+  .pb-live-board.compact .pb-live-columns { grid-template-columns: minmax(0, 1fr); }
+  .pb-live-board.compact .pb-live-column:nth-child(n + 2) { display: none; }
+  .pb-live-board.compact { min-height: 300px; }
+}
+
+/* Hellenica's default capital Y is stylised; its stylistic set swaps it for a conventional Y but also restyles E and R, so the set is enabled only on the hero headline, which has no E or R. Other headings avoid a capital Y. */
+.pb-site .pb-hero h1 { font-feature-settings: "ss01"; }
