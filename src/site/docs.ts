@@ -18,6 +18,8 @@ import cliMeta from "./content/docs/cli.md?meta";
 import mcpToolsMeta from "./content/docs/mcp-tools.md?meta";
 import dataStorageMeta from "./content/docs/data-storage.md?meta";
 import gitWorktreesMeta from "./content/docs/git-worktrees.md?meta";
+import updatingMeta from "./content/docs/updating.md?meta";
+import troubleshootingMeta from "./content/docs/troubleshooting.md?meta";
 
 export type DocsSectionId = "get-started" | "use-planban" | "reference" | "maintain" | "changelog";
 
@@ -78,7 +80,14 @@ export const docsSections: readonly DocsSection[] = [
       { id: "docs-git-worktrees", meta: gitWorktreesMeta, sourceFile: "src/site/content/docs/git-worktrees.md", breadcrumbName: "Git worktrees" },
     ],
   },
-  { id: "maintain", title: "Maintain", pages: [] },
+  {
+    id: "maintain",
+    title: "Maintain",
+    pages: [
+      { id: "docs-updating", meta: updatingMeta, sourceFile: "src/site/content/docs/updating.md", breadcrumbName: "Update" },
+      { id: "docs-troubleshooting", meta: troubleshootingMeta, sourceFile: "src/site/content/docs/troubleshooting.md", breadcrumbName: "Troubleshooting" },
+    ],
+  },
   { id: "changelog", title: "Changelog", pages: [] },
 ];
 
