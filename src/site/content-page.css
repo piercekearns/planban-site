@@ -160,12 +160,13 @@
     scrollbar-width: thin;
   }
 
-  .pb-article-code.is-text pre {
+  .pb-article-code.is-text pre,
+  .pb-article-code.is-output pre {
     white-space: pre-wrap;
     word-break: break-word;
   }
 
-  .pb-article-code.is-bash pre {
+  .pb-article-code:not(.is-text, .is-output) pre {
     white-space: pre;
     padding-right: 64px;
   }
@@ -254,6 +255,103 @@
   .pb-article .pb-article-related a:hover {
     border-color: color-mix(in oklab, var(--pb-codex) 42%, var(--pb-line));
     background: var(--pb-codex-soft);
+  }
+
+  /* Docs: generated index, previous/next links, and section navigation. */
+  .pb-docs-index {
+    display: grid;
+    gap: 26px;
+    margin: 8px 0 4px;
+  }
+
+  .pb-docs-index h3 {
+    margin: 0 0 10px;
+    color: var(--pb-ink);
+    font-size: 13px;
+    font-weight: 720;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pb-article-body .pb-docs-index ul {
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-docs-index li {
+    display: grid;
+    gap: 2px;
+  }
+
+  .pb-article .pb-docs-index a {
+    font-weight: 650;
+  }
+
+  .pb-docs-index li span {
+    color: var(--pb-muted);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .pb-docs-pager {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .pb-article .pb-docs-pager a {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border: 1px solid var(--pb-line);
+    border-radius: 12px;
+    background: color-mix(in oklab, var(--pb-glass) 80%, transparent);
+    color: var(--pb-ink);
+    font-size: 15px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .pb-article .pb-docs-pager a:hover {
+    border-color: color-mix(in oklab, var(--pb-codex) 42%, var(--pb-line));
+    background: var(--pb-codex-soft);
+  }
+
+  .pb-docs-pager a.is-next {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .pb-docs-pager small {
+    color: var(--pb-faint);
+    font-size: 12px;
+    font-weight: 720;
+    text-transform: uppercase;
+  }
+
+  .pb-docs-section-nav p {
+    margin: 0 0 10px;
+    color: var(--pb-faint);
+    font-size: 12px;
+    font-weight: 720;
+    text-transform: uppercase;
+  }
+
+  .pb-docs-section-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+  }
+
+  .pb-docs-section-nav [aria-current="page"] {
+    color: var(--pb-ink);
+    font-weight: 650;
   }
 
   /* Footer on subpages */
@@ -369,6 +467,14 @@
 
     .pb-article-header > .pb-article-lede {
       font-size: 17px;
+    }
+
+    .pb-docs-pager {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pb-docs-pager a.is-next {
+      grid-column: 1;
     }
   }
 }

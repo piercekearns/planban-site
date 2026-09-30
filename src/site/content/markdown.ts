@@ -4,7 +4,9 @@
 // ships to visitors. It supports only what the page drafts use: front matter,
 // # to ### headings, paragraphs, - and 1. lists, fenced code, a standalone
 // image with an optional "*Caption: ...*" line, and inline code, **strong**,
-// *emphasis*, [links](url), and bare https:// URLs.
+// *emphasis*, [links](url), and bare https:// URLs. A line of the form
+// <!-- component: name --> places a site component (such as the generated
+// docs index) at that point in the page.
 
 export type InlineNode =
   | { type: "text"; value: string }
@@ -18,7 +20,8 @@ export type ContentBlock =
   | { type: "paragraph"; children: InlineNode[] }
   | { type: "list"; ordered: boolean; items: InlineNode[][] }
   | { type: "code"; language: string; value: string }
-  | { type: "figure"; src: string; alt: string; caption: InlineNode[] | null };
+  | { type: "figure"; src: string; alt: string; caption: InlineNode[] | null }
+  | { type: "component"; name: string };
 
 export interface ContentFrontMatter {
   title: string;
@@ -30,6 +33,22 @@ export interface ContentFrontMatter {
 export interface ContentDocument {
   frontMatter: ContentFrontMatter;
   blocks: ContentBlock[];
+}
+
+/**
+ * The parts of a document that navigation, head tags and llms.txt need.
+ * Importing "page.md?meta" yields this instead of the whole block tree.
+ */
+export interface ContentMeta {
+  frontMatter: ContentFrontMatter;
+  /** Plain text of the page's H1. */
+  headline: string;
+}
+
+export function contentMeta(document: ContentDocument, file = document.frontMatter.path): ContentMeta {
+  const heading = document.blocks.find(block => block.type === "heading" && block.level === 1);
+  if (!heading || heading.type !== "heading") throw new Error(`${file} has no H1.`);
+  return { frontMatter: document.frontMatter, headline: heading.text };
 }
 
 export interface ParseOptions {
@@ -149,7 +168,7 @@ export function parseContentDocument(source: string, file: string, options: Pars
   const headingIds = new Set<string>();
   let index = 0;
 
-  const isBlockStart = (line: string) => /^(#{1,3} |```|- |\d+\. |!\[)/u.test(line);
+  const isBlockStart = (line: string) => /^(#{1,3} |```|- |\d+\. |!\[|<!-- component: )/u.test(line);
 
   while (index < lines.length) {
     const line = lines[index]!;
@@ -166,6 +185,13 @@ export function parseContentDocument(source: string, file: string, options: Pars
       if (headingIds.has(id)) throw new Error(`${file}: duplicate heading "${plain}".`);
       headingIds.add(id);
       blocks.push({ type: "heading", level: heading[1]!.length as 1 | 2 | 3, id, text: plain, children });
+      index += 1;
+      continue;
+    }
+
+    const component = /^<!-- component: ([a-z0-9-]+) -->$/u.exec(line);
+    if (component) {
+      blocks.push({ type: "component", name: component[1]! });
       index += 1;
       continue;
     }

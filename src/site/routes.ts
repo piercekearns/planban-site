@@ -11,7 +11,8 @@ import {
   siteOrigin,
   siteUrl,
 } from "./site-facts";
-import type { ContentDocument } from "./content/markdown";
+import { type ContentDocument, type ContentMeta, contentMeta } from "./content/markdown";
+import { type DocsPage, docsBreadcrumbs, docsPages } from "./docs";
 import claudeCodePage from "./content/claude-code.md";
 import codexPage from "./content/codex.md";
 import agentNativeKanbanPage from "./content/what-is-an-agent-native-kanban-board.md";
@@ -32,11 +33,18 @@ export type SiteRouteId =
 const contentPathPattern = /^\/(?:[a-z0-9-]+\/|docs\/(?:[a-z0-9-]+\/)?|docs\/changelog\/[a-z0-9-]+\/)$/u;
 
 export interface SiteArticle {
-  document: ContentDocument;
-  /** Short page name for the visible breadcrumb and BreadcrumbList. */
-  breadcrumbName: string;
+  /** Front matter and headline. */
+  meta: ContentMeta;
+  /** The full document for pages imported statically; docs pages load theirs through docs-content.ts. */
+  document?: ContentDocument;
+  /** Markdown source, relative to the repository root. */
+  sourceFile: string;
+  /** Breadcrumb trail below Home, ending with this page. */
+  breadcrumbs: ReadonlyArray<{ name: string; path: string }>;
   /** Screenshot used as the TechArticle image. */
   image: string;
+  /** Set for pages in the docs registry. */
+  docsPage?: DocsPage;
 }
 
 export interface SiteRoute {
@@ -74,11 +82,18 @@ const articleSources = [
 
 function articleRoute(
   id: SiteRouteId,
-  document: ContentDocument,
+  meta: ContentMeta,
   sourceFile: string,
-  options: { breadcrumbName: string; image: string; socialTitle: string },
+  options: {
+    breadcrumbs: SiteArticle["breadcrumbs"];
+    image: string;
+    socialTitle: string;
+    document?: ContentDocument;
+    docsPage?: DocsPage;
+    extraSources?: readonly string[];
+  },
 ): SiteRoute {
-  const { path, title, description } = document.frontMatter;
+  const { path, title, description } = meta.frontMatter;
   if (!contentPathPattern.test(path)) throw new Error(`${sourceFile}: path must be folder-style, like /codex/ or /docs/cli/.`);
   return {
     id,
@@ -90,10 +105,40 @@ function articleRoute(
     ogDescription: description,
     twitterDescription: description,
     indexable: true,
-    sourceFiles: [...articleSources, sourceFile],
-    article: { document, breadcrumbName: options.breadcrumbName, image: options.image },
+    sourceFiles: [...articleSources, ...(options.extraSources ?? []), sourceFile],
+    article: {
+      meta,
+      sourceFile,
+      breadcrumbs: options.breadcrumbs,
+      image: options.image,
+      ...(options.document ? { document: options.document } : {}),
+      ...(options.docsPage ? { docsPage: options.docsPage } : {}),
+    },
   };
 }
+
+function markdownRoute(
+  id: SiteRouteId,
+  document: ContentDocument,
+  sourceFile: string,
+  options: { breadcrumbName: string; image: string; socialTitle: string },
+): SiteRoute {
+  const meta = contentMeta(document, sourceFile);
+  return articleRoute(id, meta, sourceFile, {
+    breadcrumbs: [{ name: options.breadcrumbName, path: meta.frontMatter.path }],
+    image: options.image,
+    socialTitle: options.socialTitle,
+    document,
+  });
+}
+
+const docsRoutes: SiteRoute[] = docsPages.map(page => articleRoute(page.id, page.meta, page.sourceFile, {
+  breadcrumbs: docsBreadcrumbs(page),
+  image: `${siteOrigin}/assets/planban-board-light.png`,
+  socialTitle: page.meta.headline,
+  docsPage: page,
+  extraSources: ["src/site/docs.ts"],
+}));
 
 export const siteRoutes: readonly SiteRoute[] = [
   {
@@ -127,21 +172,22 @@ export const siteRoutes: readonly SiteRoute[] = [
     indexable: true,
     sourceFiles: sharedPageSources,
   },
-  articleRoute("claude-code", claudeCodePage, "src/site/content/claude-code.md", {
+  markdownRoute("claude-code", claudeCodePage, "src/site/content/claude-code.md", {
     breadcrumbName: "Claude Code",
     image: `${siteOrigin}/assets/planban-board-light.png`,
     socialTitle: "Planban for Claude Code",
   }),
-  articleRoute("codex", codexPage, "src/site/content/codex.md", {
+  markdownRoute("codex", codexPage, "src/site/content/codex.md", {
     breadcrumbName: "Codex",
     image: `${siteOrigin}/assets/planban-board-light.png`,
     socialTitle: "Planban for Codex",
   }),
-  articleRoute("what-is-an-agent-native-kanban-board", agentNativeKanbanPage, "src/site/content/what-is-an-agent-native-kanban-board.md", {
+  markdownRoute("what-is-an-agent-native-kanban-board", agentNativeKanbanPage, "src/site/content/what-is-an-agent-native-kanban-board.md", {
     breadcrumbName: "Agent-native Kanban",
     image: `${siteOrigin}/assets/planban-card-detail-light.png`,
     socialTitle: "What is an agent-native Kanban board?",
   }),
+  ...docsRoutes,
   {
     id: "not-found",
     path: "/404.html",
@@ -222,14 +268,12 @@ export function buildStructuredData() {
 
 /** Headline of a content page: its H1. */
 export function articleHeadline(article: SiteArticle): string {
-  const heading = article.document.blocks.find(block => block.type === "heading" && block.level === 1);
-  if (!heading || heading.type !== "heading") throw new Error(`${article.document.frontMatter.path} has no H1.`);
-  return heading.text;
+  return article.meta.headline;
 }
 
 export function buildArticleStructuredData(route: SiteRoute, article: SiteArticle) {
   const pageUrl = canonicalUrl(route);
-  const { description, updated } = article.document.frontMatter;
+  const { description, updated } = article.meta.frontMatter;
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -252,7 +296,12 @@ export function buildArticleStructuredData(route: SiteRoute, article: SiteArticl
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-          { "@type": "ListItem", position: 2, name: article.breadcrumbName, item: pageUrl },
+          ...article.breadcrumbs.map((crumb, index) => ({
+            "@type": "ListItem",
+            position: index + 2,
+            name: crumb.name,
+            item: `${siteOrigin}${crumb.path}`,
+          })),
         ],
       },
     ],
