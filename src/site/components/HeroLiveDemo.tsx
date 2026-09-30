@@ -72,7 +72,7 @@ export const DemoBoard = ({ planbanMark, state, compact = false }: { planbanMark
   const grouped = !sceneOne && changed;
   return <div className={`pb-live-board ${compact ? "compact" : ""}`}>
     <div className="pb-live-board-head">
-      <img src={planbanMark} alt="" />
+      <img src={planbanMark} alt="" width={18} height={14} />
       <span className="pb-live-crumb"><small>Planban /</small> Next release</span>
     </div>
     <div className="pb-live-columns">
@@ -186,7 +186,7 @@ export const HeroLiveDemo = ({ theme, hostLogos, planbanMark }: HeroLiveDemoProp
   return <div className={`pb-live ${theme} host-${scene.host} ${resetting ? "is-resetting" : ""}`} role="img" aria-label="Animated demo: a prompt typed in Codex or Claude changes the Planban board beside it">
     <div className="pb-live-agent">
       <div className="pb-live-agent-head">
-        <img src={hostLogos[scene.host]} alt="" />
+        <img src={hostLogos[scene.host]} alt="" width={18} height={18} />
         <strong>{scene.hostLabel}</strong>
         <span className="pb-live-agent-thread">new thread</span>
       </div>

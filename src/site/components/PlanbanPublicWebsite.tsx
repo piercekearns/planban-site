@@ -155,7 +155,7 @@ const AgentLogo = ({
   src: string;
   label: string;
   loading?: "eager" | "lazy";
-}) => <img src={src} alt="" aria-hidden="true" className="pb-agent-logo" data-agent={label} loading={loading} decoding="async" />;
+}) => <img src={src} alt="" aria-hidden="true" className="pb-agent-logo" data-agent={label} width={20} height={20} loading={loading} decoding="async" />;
 const CodexInstallIcon = () => <AgentLogo src={agentLogoImages.codex} label="codex" />;
 const ClaudeInstallIcon = () => <svg viewBox="0 0 100 100" aria-hidden="true" className="pb-agent-logo pb-claude-glyph">
     <circle cx="50" cy="50" r="50" fill="#ffffff" />
@@ -222,7 +222,7 @@ const PlanbanMark = ({
   theme: "light" | "dark";
   loading?: "eager" | "lazy";
 }) => <span className="pb-mark" aria-hidden="true">
-    <img src={planbanLogoImages[theme]} alt="" loading={loading} decoding="async" />
+    <img src={planbanLogoImages[theme]} alt="" width={41} height={34} loading={loading} decoding="async" />
   </span>;
 const PlanbanBrandLockup = ({
   theme,
@@ -230,7 +230,7 @@ const PlanbanBrandLockup = ({
 }: {
   theme: "light" | "dark";
   loading?: "eager" | "lazy";
-}) => <img className="pb-brand-lockup" src={planbanBrandImages[theme]} alt="" loading={loading} decoding="async" />;
+}) => <img className="pb-brand-lockup" src={planbanBrandImages[theme]} alt="" width={378} height={68} loading={loading} decoding="async" />;
 const SystemIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M4.75 5A2.75 2.75 0 0 0 2 7.75v7.5A2.75 2.75 0 0 0 4.75 18h5.75v1.5H8a.75.75 0 0 0 0 1.5h8a.75.75 0 0 0 0-1.5h-2.5V18h5.75A2.75 2.75 0 0 0 22 15.25v-7.5A2.75 2.75 0 0 0 19.25 5H4.75Zm0 1.5h14.5c.69 0 1.25.56 1.25 1.25v7.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-7.5c0-.69.56-1.25 1.25-1.25Z" fill="currentColor" />
   </svg>;
@@ -246,12 +246,12 @@ const SlashCommandMockup = ({
   theme: "light" | "dark";
 }) => <div className="pb-command-mockup">
     <div className="pb-command-hosts" aria-hidden="true">
-      <span className="active"><img src={agentLogoImages.codex} alt="" />Codex · /pb</span>
-      <span><img src={agentLogoImages.claude} alt="" />Claude · /planban:pb</span>
+      <span className="active"><img src={agentLogoImages.codex} alt="" width={13} height={13} />Codex · /pb</span>
+      <span><img src={agentLogoImages.claude} alt="" width={13} height={13} />Claude · /planban:pb</span>
     </div>
     <div className="pb-command-menu glass">
       {["Planban", "Planban Help", "Planban Create", "Planban Feedback", "Planban Tutorial"].map((label, index) => <div className={`pb-command-row ${index === 0 ? "active" : ""}`} key={label}>
-          <span className="pb-mini-mark"><img src={planbanLogoImages[theme]} alt="" loading="lazy" decoding="async" /></span>
+          <span className="pb-mini-mark"><img src={planbanLogoImages[theme]} alt="" width={18} height={15} loading="lazy" decoding="async" /></span>
           <strong>{label}</strong>
           <span>{["Open the Planban board beside this thread", "Show Planban actions and reopen tutorial/help", "Create boards, Items, or Groups from rough notes", "Package Planban bug reports and product feedback", "Open the interactive Planban tutorial"][index]}</span>
           <small>Personal</small>
