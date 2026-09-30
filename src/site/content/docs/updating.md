@@ -3,7 +3,7 @@ title: "Update Planban | Planban docs"
 description: "How Planban tells you an update is ready, what the board's update buttons do in Codex, the commands to update in Codex and Claude Code, and what the update check sends."
 path: /docs/updating/
 updated: 2026-09-30
-sources: README.md (Updates, Install With Claude Code details, Manual Install); release/latest.json; src/core/version.ts; src/core/updatePreflight.ts (recommendedAction, buildFallbackPrompt); src/core/updateRunner.ts (buildUpdateCommandPlan); src/cli.ts (update); src/web/main.tsx (update panel); src/server/server.ts (fetchLatestUpdateManifest); release/notes/v1.1.6.md (Updating)
+sources: README.md (Updates, Install With Claude Code details, Manual Install); release/latest.json; src/core/version.ts; src/core/updatePreflight.ts (recommendedAction, buildFallbackPrompt); src/core/updateRunner.ts (buildUpdateCommandPlan); src/cli.ts (update); src/web/main.tsx (update panel, update prompt commands); src/server/server.ts (fetchLatestUpdateManifest); release/notes/v1.1.6.md (Updating)
 ---
 
 # Update Planban
@@ -30,23 +30,27 @@ In Claude Code, update with the plugin commands below.
 
 ## How do I update Planban in Codex?
 
-Choose **Update now** or **Update with Codex** on the board, or update from a terminal. For a Git-backed marketplace install, upgrade the marketplace and reinstall the plugin:
+Choose **Update now** or **Update with Codex** on the board, or update from a terminal. These are the commands the board's update prompt gives. For a Git-backed marketplace install, upgrade the marketplace, then run the rest in the marketplace folder:
 
 ```bash
 codex plugin marketplace upgrade planban
-codex plugin add planban@planban
-```
-
-For a local clone, update the clone first, then reinstall. These are the steps Planban's own updater runs:
-
-```bash
 cd "$PLANBAN_ROOT"
-git fetch origin main
-git merge --ff-only FETCH_HEAD
 npm install
 node scripts/configure-local-plugin.mjs "$PWD"
 codex plugin add planban@planban
 ```
+
+For a local clone install, update the clone with `git pull` instead of upgrading the marketplace, then run the same steps in the clone:
+
+```bash
+cd "$PLANBAN_ROOT"
+git pull
+npm install
+node scripts/configure-local-plugin.mjs "$PWD"
+codex plugin add planban@planban
+```
+
+`PLANBAN_ROOT` is your marketplace folder or clone; see [How do I run the CLI?](/docs/cli/#how-do-i-run-the-cli) to set it.
 
 Then start a new Codex session. If an older cached plugin still contains `__PLANBAN_REPO_ROOT__`, refresh the marketplace and reinstall the plugin, then start a new session.
 
