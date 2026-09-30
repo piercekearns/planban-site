@@ -1,8 +1,8 @@
 /* Variant C: Hellenica (the wordmark face) as the display font. Regular is the only weight installed, so headings use 400 and never synthesise bold. */
-/* Letters, digits, and plain punctuation come from Hellenica. Quotes, apostrophes, ?, !, &, @, # fall back to the system face, whose forms are conventional. The weight range stops the browser faux-bolding the single Hellenica weight. */
+/* Letters, digits, and plain punctuation come from Hellenica. Hellenica-latin.woff2 is a subset of Hellenica.otf holding exactly the unicode-range below plus the kern and ss01 features; the OTF stays as the fallback. Quotes, apostrophes, ?, !, &, @, # fall back to the system face, whose forms are conventional. The weight range stops the browser faux-bolding the single Hellenica weight. */
 @font-face {
   font-family: "Hellenica";
-  src: url("/assets/fonts/Hellenica.otf?v=3") format("opentype");
+  src: url("/assets/fonts/Hellenica-latin.woff2") format("woff2"), url("/assets/fonts/Hellenica.otf?v=3") format("opentype");
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;

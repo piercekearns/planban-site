@@ -286,12 +286,27 @@
   .pb-live-column:nth-child(3) { display: none; }
 }
 
-/* Hero frame background behind the live demo */
+/* Hero frame background behind the live demo. This is the home page LCP
+   element, so browsers that understand typed image-set() get AVIF or WebP,
+   and phones get the centre 3:4 crop, which is exactly what background-size:
+   cover shows in the 3:4 phone frame. index.html preloads the same file. */
 .pb-hero-live-frame .pb-hero-media {
   background: #071a55 url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.jpg") center / cover no-repeat;
+  background-image: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.jpg") type("image/jpeg"));
 }
 .pb-site.dark .pb-hero-live-frame .pb-hero-media {
   background: #050b22 url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.jpg") center / cover no-repeat;
+  background-image: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.jpg") type("image/jpeg"));
+}
+@media (max-width: 980px) {
+  .pb-hero-live-frame .pb-hero-media {
+    background-image: url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-3x4.jpg");
+    background-image: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-3x4.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-3x4.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-3x4.jpg") type("image/jpeg"));
+  }
+  .pb-site.dark .pb-hero-live-frame .pb-hero-media {
+    background-image: url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-3x4.jpg");
+    background-image: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-3x4.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-3x4.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-3x4.jpg") type("image/jpeg"));
+  }
 }
 
 /* Second host CTA */

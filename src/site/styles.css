@@ -706,35 +706,6 @@ body {
       inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   }
 
-  .pb-hero-demo-video,
-  .pb-hero-demo-poster {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .pb-hero-demo-video {
-    cursor: pointer;
-  }
-
-  .pb-hero-demo-video[controls] {
-    cursor: auto;
-  }
-
-  .pb-hero-demo-video:focus-visible {
-    outline: 2px solid color-mix(in oklab, var(--pb-codex-bright) 76%, white);
-    outline-offset: -6px;
-  }
-
-  .pb-hero-demo-video:fullscreen,
-  .pb-hero-demo-video:-webkit-full-screen {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: #000000;
-  }
-
   .pb-hero-copy {
     min-width: 0;
     width: 100%;
@@ -3221,6 +3192,23 @@ body {
     .planban-demo-grid,
     .planban-future {
       grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* The features frame background as AVIF or WebP where typed image-set() is
+     supported. A custom property holding an unsupported image-set() would
+     compute to no image at all, so the JPEG values above stay the default. */
+  @supports (background-image: image-set(url("x.avif") type("image/avif"))) {
+    .pb-grid-frame-features {
+      --pb-proof-bg-light: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.jpg") type("image/jpeg"));
+      --pb-proof-bg-dark: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.jpg") type("image/jpeg"));
+    }
+
+    @media (max-width: 980px) {
+      .pb-grid-frame-features {
+        --pb-proof-bg-light: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-4x5.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-4x5.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-4x5.jpg") type("image/jpeg"));
+        --pb-proof-bg-dark: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-4x5.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-4x5.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-4x5.jpg") type("image/jpeg"));
+      }
     }
   }
 }

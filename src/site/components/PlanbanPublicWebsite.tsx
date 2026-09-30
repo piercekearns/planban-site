@@ -40,37 +40,6 @@ const productImages = {
     cardDetail: cardDetailDarkImage
   }
 } as const;
-const heroVideos = {
-  light: {
-    desktop: {
-      src: "/assets/hero-video/planban-hero-light-4k-labeled.mp4",
-      poster: "/assets/hero-video/planban-hero-light-labeled-poster.jpg",
-      width: 3840,
-      height: 2160
-    },
-    mobile: {
-      src: "/assets/hero-video/planban-hero-light-mobile-labeled.mp4",
-      poster: "/assets/hero-video/planban-hero-light-mobile-labeled-poster.jpg",
-      width: 2160,
-      height: 2700
-    }
-  },
-  dark: {
-    desktop: {
-      src: "/assets/hero-video/planban-hero-dark-4k-labeled.mp4",
-      poster: "/assets/hero-video/planban-hero-dark-labeled-poster.jpg",
-      width: 3840,
-      height: 2160
-    },
-    mobile: {
-      src: "/assets/hero-video/planban-hero-dark-mobile-labeled.mp4",
-      poster: "/assets/hero-video/planban-hero-dark-mobile-labeled-poster.jpg",
-      width: 2160,
-      height: 2700
-    }
-  }
-} as const;
-const heroMobileVideoQuery = "(max-width: 980px)";
 const planbanSignupEndpoint = (import.meta.env.VITE_PLANBAN_SIGNUP_ENDPOINT as string | undefined) || "/api/subscribe";
 const planbanXUrl = (import.meta.env.VITE_PLANBAN_X_URL as string | undefined) || "https://x.com/planbanai";
 const planbanYouTubeUrl = import.meta.env.VITE_PLANBAN_YOUTUBE_URL as string | undefined;
@@ -103,32 +72,33 @@ const demoShots = [{
   caption: "Open an Item to read the Spec your agent wrote, the Plan it is following, and the one next action that says what happens now and who does it.",
   visual: "detail"
 }] as const;
+// Simple Icons (CC0) copied locally; see public/assets/icons/README.md.
 const sourceApps = [{
   name: "GitHub",
   kind: "image",
-  src: "https://cdn.simpleicons.org/github/181717",
-  darkSrc: "https://cdn.simpleicons.org/github/ffffff",
+  src: "/assets/icons/github.svg",
+  darkSrc: "/assets/icons/github-white.svg",
   position: "top-1"
 }, {
   name: "Notion",
   kind: "image",
-  src: "https://cdn.simpleicons.org/notion/000000",
-  darkSrc: "https://cdn.simpleicons.org/notion/ffffff",
+  src: "/assets/icons/notion.svg",
+  darkSrc: "/assets/icons/notion-white.svg",
   position: "top-2"
 }, {
   name: "Linear",
   kind: "image",
-  src: "https://cdn.simpleicons.org/linear/5E6AD2",
+  src: "/assets/icons/linear.svg",
   position: "top-3"
 }, {
   name: "Jira",
   kind: "image",
-  src: "https://cdn.simpleicons.org/jira/0052CC",
+  src: "/assets/icons/jira.svg",
   position: "top-4"
 }, {
   name: "Obsidian",
   kind: "image",
-  src: "https://cdn.simpleicons.org/obsidian/7C3AED",
+  src: "/assets/icons/obsidian.svg",
   position: "bottom-1"
 }, {
   name: "Notes",
@@ -137,12 +107,12 @@ const sourceApps = [{
 }, {
   name: "Google Docs",
   kind: "image",
-  src: "https://cdn.simpleicons.org/googledocs/4285F4",
+  src: "/assets/icons/google-docs.svg",
   position: "bottom-3"
 }, {
   name: "WhatsApp",
   kind: "image",
-  src: "https://cdn.simpleicons.org/whatsapp/25D366",
+  src: "/assets/icons/whatsapp.svg",
   position: "bottom-4"
 }] as const;
 const underHoodItems = [{
@@ -185,7 +155,7 @@ const AgentLogo = ({
   src: string;
   label: string;
   loading?: "eager" | "lazy";
-}) => <img src={src} alt="" aria-hidden="true" className="pb-agent-logo" data-agent={label} loading={loading} decoding="async" />;
+}) => <img src={src} alt="" aria-hidden="true" className="pb-agent-logo" data-agent={label} width={20} height={20} loading={loading} decoding="async" />;
 const CodexInstallIcon = () => <AgentLogo src={agentLogoImages.codex} label="codex" />;
 const ClaudeInstallIcon = () => <svg viewBox="0 0 100 100" aria-hidden="true" className="pb-agent-logo pb-claude-glyph">
     <circle cx="50" cy="50" r="50" fill="#ffffff" />
@@ -252,7 +222,7 @@ const PlanbanMark = ({
   theme: "light" | "dark";
   loading?: "eager" | "lazy";
 }) => <span className="pb-mark" aria-hidden="true">
-    <img src={planbanLogoImages[theme]} alt="" loading={loading} decoding="async" />
+    <img src={planbanLogoImages[theme]} alt="" width={41} height={34} loading={loading} decoding="async" />
   </span>;
 const PlanbanBrandLockup = ({
   theme,
@@ -260,7 +230,7 @@ const PlanbanBrandLockup = ({
 }: {
   theme: "light" | "dark";
   loading?: "eager" | "lazy";
-}) => <img className="pb-brand-lockup" src={planbanBrandImages[theme]} alt="" loading={loading} decoding="async" />;
+}) => <img className="pb-brand-lockup" src={planbanBrandImages[theme]} alt="" width={378} height={68} loading={loading} decoding="async" />;
 const SystemIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M4.75 5A2.75 2.75 0 0 0 2 7.75v7.5A2.75 2.75 0 0 0 4.75 18h5.75v1.5H8a.75.75 0 0 0 0 1.5h8a.75.75 0 0 0 0-1.5h-2.5V18h5.75A2.75 2.75 0 0 0 22 15.25v-7.5A2.75 2.75 0 0 0 19.25 5H4.75Zm0 1.5h14.5c.69 0 1.25.56 1.25 1.25v7.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-7.5c0-.69.56-1.25 1.25-1.25Z" fill="currentColor" />
   </svg>;
@@ -276,12 +246,12 @@ const SlashCommandMockup = ({
   theme: "light" | "dark";
 }) => <div className="pb-command-mockup">
     <div className="pb-command-hosts" aria-hidden="true">
-      <span className="active"><img src={agentLogoImages.codex} alt="" />Codex · /pb</span>
-      <span><img src={agentLogoImages.claude} alt="" />Claude · /planban:pb</span>
+      <span className="active"><img src={agentLogoImages.codex} alt="" width={13} height={13} />Codex · /pb</span>
+      <span><img src={agentLogoImages.claude} alt="" width={13} height={13} />Claude · /planban:pb</span>
     </div>
     <div className="pb-command-menu glass">
       {["Planban", "Planban Help", "Planban Create", "Planban Feedback", "Planban Tutorial"].map((label, index) => <div className={`pb-command-row ${index === 0 ? "active" : ""}`} key={label}>
-          <span className="pb-mini-mark"><img src={planbanLogoImages[theme]} alt="" loading="lazy" decoding="async" /></span>
+          <span className="pb-mini-mark"><img src={planbanLogoImages[theme]} alt="" width={18} height={15} loading="lazy" decoding="async" /></span>
           <strong>{label}</strong>
           <span>{["Open the Planban board beside this thread", "Show Planban actions and reopen tutorial/help", "Create boards, Items, or Groups from rough notes", "Package Planban bug reports and product feedback", "Open the interactive Planban tutorial"][index]}</span>
           <small>Personal</small>
@@ -295,110 +265,6 @@ const SlashCommandMockup = ({
       <span className="pb-composer-send">↑</span>
     </div>
   </div>;
-const HeroDemoVideo = ({
-  theme
-}: {
-  theme: "light" | "dark";
-}) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [controlsVisible, setControlsVisible] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(() => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
-  const [useMobileVideo, setUseMobileVideo] = useState(() => typeof window !== "undefined" && window.matchMedia?.(heroMobileVideoQuery).matches);
-  const [mobileVideoCanPlay, setMobileVideoCanPlay] = useState(() => typeof window === "undefined" || !window.matchMedia?.(heroMobileVideoQuery).matches);
-  const video = heroVideos[theme][useMobileVideo ? "mobile" : "desktop"];
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const syncReducedMotion = () => setReducedMotion(media.matches);
-    syncReducedMotion();
-    media.addEventListener?.("change", syncReducedMotion);
-    return () => media.removeEventListener?.("change", syncReducedMotion);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const media = window.matchMedia(heroMobileVideoQuery);
-    const syncVideoLayout = () => setUseMobileVideo(media.matches);
-    syncVideoLayout();
-    media.addEventListener?.("change", syncVideoLayout);
-    return () => media.removeEventListener?.("change", syncVideoLayout);
-  }, []);
-
-  useEffect(() => {
-    if (!useMobileVideo) {
-      setMobileVideoCanPlay(true);
-      return;
-    }
-
-    setMobileVideoCanPlay(false);
-    if (typeof window === "undefined") return;
-
-    const heroCopy = document.querySelector<HTMLElement>(".pb-hero-copy");
-    if (!heroCopy) return;
-
-    let hasUnlocked = false;
-    const unlockWhenCopyHasCleared = () => {
-      if (hasUnlocked) return;
-      const { bottom } = heroCopy.getBoundingClientRect();
-      if (bottom > 144) return;
-      hasUnlocked = true;
-      setMobileVideoCanPlay(true);
-      window.removeEventListener("scroll", unlockWhenCopyHasCleared);
-      window.removeEventListener("resize", unlockWhenCopyHasCleared);
-    };
-
-    unlockWhenCopyHasCleared();
-    window.addEventListener("scroll", unlockWhenCopyHasCleared, { passive: true });
-    window.addEventListener("resize", unlockWhenCopyHasCleared);
-
-    return () => {
-      window.removeEventListener("scroll", unlockWhenCopyHasCleared);
-      window.removeEventListener("resize", unlockWhenCopyHasCleared);
-    };
-  }, [useMobileVideo, theme]);
-
-  useEffect(() => {
-    setControlsVisible(false);
-    const element = videoRef.current;
-    if (!element || reducedMotion) return;
-    element.controls = false;
-    if (useMobileVideo && !mobileVideoCanPlay) {
-      element.pause();
-      element.currentTime = 0;
-      return;
-    }
-    element.currentTime = 0;
-    element.play().catch(() => undefined);
-  }, [mobileVideoCanPlay, reducedMotion, theme, useMobileVideo]);
-
-  useEffect(() => {
-    const element = videoRef.current;
-    if (!element) return;
-    element.controls = controlsVisible;
-  }, [controlsVisible, theme]);
-
-  const showControls = () => {
-    if (reducedMotion) return;
-    setControlsVisible(true);
-    const element = videoRef.current;
-    if (!element) return;
-    if (element.ended) {
-      element.currentTime = 0;
-      element.play().catch(() => undefined);
-    }
-  };
-
-  if (reducedMotion) {
-    return <img className="pb-hero-demo-poster" src={video.poster} alt="Planban demo in the Codex browser" width={video.width} height={video.height} loading="eager" decoding="async" fetchPriority="high" />;
-  }
-
-  return <video key={video.src} ref={videoRef} className="pb-hero-demo-video" src={video.src} poster={video.poster} width={video.width} height={video.height} muted playsInline autoPlay={!useMobileVideo || mobileVideoCanPlay} preload="metadata" onClick={showControls} onKeyDown={event => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    showControls();
-  }} tabIndex={0} aria-label="Planban demo video in the Codex browser" />;
-};
 const BringPlansVisual = ({
   theme
 }: {
@@ -409,7 +275,7 @@ const BringPlansVisual = ({
     </svg>
     <div className="pb-source-row top">
       {sourceApps.slice(0, 4).map(source => <span key={source.name} className="pb-source-icon" aria-label={source.name}>
-          {source.kind === "image" ? <img src={theme === "dark" && "darkSrc" in source ? source.darkSrc : source.src} alt="" loading="lazy" decoding="async" /> : <span className="pb-notes-icon" />}
+          {source.kind === "image" ? <img src={theme === "dark" && "darkSrc" in source ? source.darkSrc : source.src} alt="" width={31} height={31} loading="lazy" decoding="async" /> : <span className="pb-notes-icon" />}
         </span>)}
     </div>
     <div className="pb-context-hub">
@@ -417,7 +283,7 @@ const BringPlansVisual = ({
     </div>
     <div className="pb-source-row bottom">
       {sourceApps.slice(4).map(source => <span key={source.name} className="pb-source-icon" aria-label={source.name}>
-          {source.kind === "image" ? <img src={theme === "dark" && "darkSrc" in source ? source.darkSrc : source.src} alt="" loading="lazy" decoding="async" /> : <span className="pb-notes-icon" />}
+          {source.kind === "image" ? <img src={theme === "dark" && "darkSrc" in source ? source.darkSrc : source.src} alt="" width={31} height={31} loading="lazy" decoding="async" /> : <span className="pb-notes-icon" />}
         </span>)}
     </div>
   </div>;
