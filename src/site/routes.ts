@@ -338,7 +338,7 @@ export function renderRouteHead(route: SiteRoute): string {
     `<meta name="twitter:image" content="${planbanSocialImageUrl}" />`,
     `<meta name="twitter:image:alt" content="Planban logo and wordmark." />`,
     route.indexable ? `<link rel="canonical" href="${pageUrl}" />` : null,
-    route.preloadDisplayFont ? `<link rel="preload" href="/assets/fonts/Hellenica.otf" as="font" type="font/otf" crossorigin />` : null,
+    route.preloadDisplayFont ? `<link rel="preload" href="/assets/fonts/Hellenica-latin.woff2" as="font" type="font/woff2" crossorigin />` : null,
     route.structuredData ? `<script type="application/ld+json">${inlineJson(buildStructuredData())}</script>` : null,
     route.article ? `<script type="application/ld+json">${inlineJson(buildArticleStructuredData(route, route.article))}</script>` : null,
   ];
