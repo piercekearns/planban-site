@@ -37,7 +37,7 @@ claude mcp list
 node plugins/planban/scripts/launch-planban.mjs --tutorial
 ```
 
-`claude mcp list` should show `plugin:planban:planban` as connected. Then start a new Claude Code session.
+`claude mcp list` should show `plugin:planban:planban` as connected. Then start a new Claude Code session. [Install Planban in Claude Code](/docs/install-claude-code/) covers every install path, how to check it worked, and first-launch behaviour.
 
 Planban is installed separately in each host. If you also use Codex, both installs share the same device-local boards.
 

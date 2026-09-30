@@ -38,7 +38,7 @@ codex plugin list --marketplace planban
 node plugins/planban/scripts/launch-planban.mjs --tutorial
 ```
 
-Then open the printed local tutorial URL. In Codex, ask your agent to open it in the in-app browser. The README also has PowerShell and local clone versions.
+Then open the printed local tutorial URL. In Codex, ask your agent to open it in the in-app browser. [Install Planban in Codex](/docs/install-codex/) covers PowerShell on Windows, a local clone, how to check it worked, and first-launch behaviour.
 
 Planban is installed separately in each host. If you also use Claude, both installs share the same device-local boards.
 
