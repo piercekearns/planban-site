@@ -188,6 +188,11 @@ if (await pathExists(join(siteDir, "sitemap.xml"))) {
   }
   for (const file of htmlFiles) {
     const html = await readFile(file, "utf8");
+    // Every page carries the Umami tracker exactly once, limited to planban.ai.
+    const umamiTags = html.match(/<script[^>]+src="https:\/\/cloud\.umami\.is\/script\.js"[^>]*>/gu) ?? [];
+    if (umamiTags.length !== 1 || !umamiTags[0].includes('data-domains="planban.ai"')) {
+      findings.push({ type: "umami-script", path: displayPath(file), count: umamiTags.length });
+    }
     for (const match of html.matchAll(/\shref="([^"]+)"/gu)) {
       const href = match[1].replaceAll("&amp;", "&");
       let target;

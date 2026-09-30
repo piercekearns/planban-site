@@ -344,7 +344,7 @@ const PrivacyPolicyPage = ({
       <section className="pb-privacy-shell glass">
         <p className="pb-kicker">Privacy</p>
         <h1>Privacy Policy</h1>
-        <p className="pb-privacy-updated">Last updated: June 14, 2026</p>
+        <p className="pb-privacy-updated">Last updated: 30 September 2026</p>
         <div className="pb-privacy-content">
           <section>
             <h2>What Planban Collects</h2>
@@ -357,6 +357,7 @@ const PrivacyPolicyPage = ({
           <section>
             <h2>Website Hosting</h2>
             <p>Like most websites, Planban's public site may process standard request metadata needed to serve, cache, route, and protect the site, such as IP address, user agent, request path, and timing information.</p>
+            <p>To understand how the site is used, Planban uses Umami Cloud, a cookieless analytics service operated by Umami Software, Inc. Umami does not set cookies, does not track visitors across websites, and does not store personal data. Planban only sees aggregated statistics such as page views, referring sites, browsers, operating systems, device types, and countries. Umami states that Umami Cloud servers are located in the EU and US. Read <a href="https://umami.is/privacy">Umami's privacy policy</a> for how Umami handles data.</p>
           </section>
           <section>
             <h2>Local Product Data</h2>
