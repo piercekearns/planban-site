@@ -103,32 +103,33 @@ const demoShots = [{
   caption: "Open an Item to read the Spec your agent wrote, the Plan it is following, and the one next action that says what happens now and who does it.",
   visual: "detail"
 }] as const;
+// Simple Icons (CC0) copied locally; see public/assets/icons/README.md.
 const sourceApps = [{
   name: "GitHub",
   kind: "image",
-  src: "https://cdn.simpleicons.org/github/181717",
-  darkSrc: "https://cdn.simpleicons.org/github/ffffff",
+  src: "/assets/icons/github.svg",
+  darkSrc: "/assets/icons/github-white.svg",
   position: "top-1"
 }, {
   name: "Notion",
   kind: "image",
-  src: "https://cdn.simpleicons.org/notion/000000",
-  darkSrc: "https://cdn.simpleicons.org/notion/ffffff",
+  src: "/assets/icons/notion.svg",
+  darkSrc: "/assets/icons/notion-white.svg",
   position: "top-2"
 }, {
   name: "Linear",
   kind: "image",
-  src: "https://cdn.simpleicons.org/linear/5E6AD2",
+  src: "/assets/icons/linear.svg",
   position: "top-3"
 }, {
   name: "Jira",
   kind: "image",
-  src: "https://cdn.simpleicons.org/jira/0052CC",
+  src: "/assets/icons/jira.svg",
   position: "top-4"
 }, {
   name: "Obsidian",
   kind: "image",
-  src: "https://cdn.simpleicons.org/obsidian/7C3AED",
+  src: "/assets/icons/obsidian.svg",
   position: "bottom-1"
 }, {
   name: "Notes",
@@ -137,12 +138,12 @@ const sourceApps = [{
 }, {
   name: "Google Docs",
   kind: "image",
-  src: "https://cdn.simpleicons.org/googledocs/4285F4",
+  src: "/assets/icons/google-docs.svg",
   position: "bottom-3"
 }, {
   name: "WhatsApp",
   kind: "image",
-  src: "https://cdn.simpleicons.org/whatsapp/25D366",
+  src: "/assets/icons/whatsapp.svg",
   position: "bottom-4"
 }] as const;
 const underHoodItems = [{
@@ -409,7 +410,7 @@ const BringPlansVisual = ({
     </svg>
     <div className="pb-source-row top">
       {sourceApps.slice(0, 4).map(source => <span key={source.name} className="pb-source-icon" aria-label={source.name}>
-          {source.kind === "image" ? <img src={theme === "dark" && "darkSrc" in source ? source.darkSrc : source.src} alt="" loading="lazy" decoding="async" /> : <span className="pb-notes-icon" />}
+          {source.kind === "image" ? <img src={theme === "dark" && "darkSrc" in source ? source.darkSrc : source.src} alt="" width={31} height={31} loading="lazy" decoding="async" /> : <span className="pb-notes-icon" />}
         </span>)}
     </div>
     <div className="pb-context-hub">
@@ -417,7 +418,7 @@ const BringPlansVisual = ({
     </div>
     <div className="pb-source-row bottom">
       {sourceApps.slice(4).map(source => <span key={source.name} className="pb-source-icon" aria-label={source.name}>
-          {source.kind === "image" ? <img src={theme === "dark" && "darkSrc" in source ? source.darkSrc : source.src} alt="" loading="lazy" decoding="async" /> : <span className="pb-notes-icon" />}
+          {source.kind === "image" ? <img src={theme === "dark" && "darkSrc" in source ? source.darkSrc : source.src} alt="" width={31} height={31} loading="lazy" decoding="async" /> : <span className="pb-notes-icon" />}
         </span>)}
     </div>
   </div>;
