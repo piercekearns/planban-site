@@ -3,7 +3,6 @@ title: "Kanban board for Codex | Planban"
 description: "Planban is a local-first, agent-native Kanban board that installs as a Codex plugin. Codex keeps the plan current; you see the whole project."
 path: /codex/
 updated: 2026-09-30
-appliesTo: v1.1.6
 ---
 
 # Kanban board for Codex
@@ -12,9 +11,9 @@ Planban is a local-first, agent-native Kanban board that installs as a plugin in
 
 You describe the work in the thread. Codex turns it into Items and Groups, writes the Spec and Plan, and keeps each card's Status and next action up to date as it works. You open the board beside the thread to see what exists, where it is up to, and what needs your decision.
 
-![Planban board open in the Codex in-app browser beside a thread](/assets/placeholder-codex-board.png)
+![A Planban board with Items in In Progress, Up Next, Pending, and Complete columns](/assets/planban-board-light.png)
 
-*Caption: The Planban board open in the Codex in-app browser. Items sit in Status columns, and each card shows its summary and next action.*
+*Caption: The Planban board. In Codex it opens in the in-app browser beside the thread. Items sit in Status columns, and each card shows its priority and next action.*
 
 ## How do I install Planban in Codex?
 
@@ -89,5 +88,3 @@ Planban is built for one person directing project work with agents. If you need 
 Use the feedback button in the board toolbar. Codex drafts a GitHub issue from your note and checks existing issues first. Nothing is filed publicly until you have reviewed it.
 
 You can also open an issue directly at https://github.com/piercekearns/planban/issues/new/choose. The full install guide, including update steps, is in the [README on GitHub](https://github.com/piercekearns/planban#install-with-codex).
-
-Applies to Planban v1.1.6. Updated 30 September 2026.

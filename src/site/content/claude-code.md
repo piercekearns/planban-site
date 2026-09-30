@@ -3,7 +3,6 @@ title: "Kanban board for Claude Code | Planban"
 description: "Planban is a local-first, agent-native Kanban board that installs as a Claude Code plugin. Claude keeps the plan current; you see the whole project."
 path: /claude-code/
 updated: 2026-09-30
-appliesTo: v1.1.6
 ---
 
 # Kanban board for Claude Code
@@ -12,9 +11,9 @@ Planban is a local-first, agent-native Kanban board that installs as a plugin in
 
 You describe the work in the conversation. Claude turns it into Items and Groups, writes the Spec and Plan, and keeps each card's Status and next action up to date as it works. You open the board beside the session to see what exists, where it is up to, and what needs your decision.
 
-![Planban board open in the Claude Code browser pane beside a session](/assets/placeholder-claude-code-board.png)
+![A Planban board with Items in In Progress, Up Next, Pending, and Complete columns](/assets/planban-board-light.png)
 
-*Caption: The Planban board open in the Claude Code browser pane. Items sit in Status columns, and each card shows its summary and next action.*
+*Caption: The Planban board. In Claude Code it opens in the browser pane beside the session. Items sit in Status columns, and each card shows its priority and next action.*
 
 ## How do I install Planban in Claude Code?
 
@@ -85,5 +84,3 @@ Planban is built for one person directing project work with agents. If you need 
 Use the feedback button in the board toolbar, or run `/planban:planban-feedback`. Claude drafts a GitHub issue from your note and checks existing issues first. Nothing is filed publicly until you have reviewed it.
 
 You can also open an issue directly at https://github.com/piercekearns/planban/issues/new/choose. The full install guide, including the local clone and update steps, is in the [README on GitHub](https://github.com/piercekearns/planban#install-with-claude-code).
-
-Applies to Planban v1.1.6. Updated 30 September 2026.

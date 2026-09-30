@@ -3,7 +3,6 @@ title: "Planban FAQ"
 description: "Answers to common questions about Planban: supported agents, where data is stored, licence, offline use, other MCP hosts, and how to install."
 path: /
 updated: 2026-09-30
-appliesTo: v1.1.6
 ---
 
 ## What is Planban?

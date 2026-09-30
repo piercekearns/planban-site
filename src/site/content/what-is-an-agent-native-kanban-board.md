@@ -3,7 +3,6 @@ title: "What is an agent-native Kanban board? | Planban"
 description: "An agent-native Kanban board is one your AI agents keep current while you own intent, priority and acceptance. How it works, with Planban as the example."
 path: /what-is-an-agent-native-kanban-board/
 updated: 2026-09-30
-appliesTo: v1.1.6
 ---
 
 # What is an agent-native Kanban board?
@@ -37,6 +36,10 @@ Planban uses a small, fixed vocabulary. It is strict about what each term means 
 
 These layers keep the top of the board readable. You see concise cards first. Detail appears when you open an Item.
 
+![An open Planban Group showing its Status, next action, objective, Spec and Plan tabs, and its Items listed by Status](/assets/planban-card-detail-light.png)
+
+*Caption: An open Group in Planban. Its Items are listed by Status, with the Group's next action, objective, Spec, and Plan beside them.*
+
 ## What does it look like in practice?
 
 Planban is an agent-native Kanban board for Codex and Claude. Here is a typical walk-through in one project.
@@ -67,10 +70,8 @@ Planban is built for one person directing continuing project work with one or mo
 
 ## How do I try it?
 
-Planban v1.1.6 installs as a plugin in Codex and Claude Code. Any other MCP host can use the same tools and open the board as a link. It is open source under the MIT licence.
+Planban v{{planbanVersion}} installs as a plugin in Codex and Claude Code. Any other MCP host can use the same tools and open the board as a link. It is open source under the MIT licence.
 
 - [Kanban board for Codex](/codex/)
 - [Kanban board for Claude Code](/claude-code/)
 - [Planban on GitHub](https://github.com/piercekearns/planban#readme)
-
-Applies to Planban v1.1.6. Updated 30 September 2026.
