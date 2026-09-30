@@ -5,6 +5,10 @@
 // ("?meta"); the full documents load through docs-content.ts.
 import type { ContentMeta } from "./content/markdown";
 import docsIndexMeta from "./content/docs/index.md?meta";
+import installCodexMeta from "./content/docs/install-codex.md?meta";
+import installClaudeCodeMeta from "./content/docs/install-claude-code.md?meta";
+import otherMcpHostsMeta from "./content/docs/other-mcp-hosts.md?meta";
+import setUpAProjectMeta from "./content/docs/set-up-a-project.md?meta";
 
 export type DocsSectionId = "get-started" | "use-planban" | "reference" | "maintain" | "changelog";
 
@@ -34,7 +38,16 @@ export const docsIndexPage: DocsPage = {
 };
 
 export const docsSections: readonly DocsSection[] = [
-  { id: "get-started", title: "Get started", pages: [] },
+  {
+    id: "get-started",
+    title: "Get started",
+    pages: [
+      { id: "docs-install-codex", meta: installCodexMeta, sourceFile: "src/site/content/docs/install-codex.md", breadcrumbName: "Install in Codex" },
+      { id: "docs-install-claude-code", meta: installClaudeCodeMeta, sourceFile: "src/site/content/docs/install-claude-code.md", breadcrumbName: "Install in Claude Code" },
+      { id: "docs-other-mcp-hosts", meta: otherMcpHostsMeta, sourceFile: "src/site/content/docs/other-mcp-hosts.md", breadcrumbName: "Other MCP hosts" },
+      { id: "docs-set-up-a-project", meta: setUpAProjectMeta, sourceFile: "src/site/content/docs/set-up-a-project.md", breadcrumbName: "Set up a project" },
+    ],
+  },
   { id: "use-planban", title: "Use Planban", pages: [] },
   { id: "reference", title: "Reference", pages: [] },
   { id: "maintain", title: "Maintain", pages: [] },
