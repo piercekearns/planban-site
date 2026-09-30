@@ -1,6 +1,6 @@
 ---
 title: "Troubleshooting Planban | Planban docs"
-description: "Fixes for common Planban problems: missing tools, runtime not found, a project that is not initialized, a busy port, the launch log, the board not opening, and stale plugins."
+description: "Fixes for common Planban problems: missing tools, runtime not found, a project that is not set up, a busy port, the launch log, the board not opening, and stale plugins."
 path: /docs/troubleshooting/
 updated: 2026-09-30
 sources: plugins/planban/scripts/runtime-root.mjs; plugins/planban/scripts/start-planban-mcp.mjs; src/core/storage.ts (loadState); plugins/planban/scripts/project-dir.mjs; plugins/planban/scripts/launch-planban.mjs (port and stale-process messages, --port, launchLogPath); plugins/planban/mcp/server.mjs (launchBoard); plugins/planban/.mcp.json; README.md (Manual Install, Install With Claude Code details, Feedback With Codex); plugins/planban/skills/pb/SKILL.md; plugins/planban/skills/planban-feedback/SKILL.md; src/web/main.tsx (feedback dialog, More Board actions menu); src/server/server.ts (polling); SUPPORT.md; SECURITY.md; .github/ISSUE_TEMPLATE/
