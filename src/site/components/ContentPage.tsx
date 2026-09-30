@@ -86,7 +86,7 @@ function renderBlock(block: ContentBlock, key: number, headingOffset = 0): React
               <tr>{block.header.map((cell, index) => <th key={index} scope="col">{renderInline(cell)}</th>)}</tr>
             </thead>
             <tbody>
-              {block.rows.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, index) => <td key={index}>{renderInline(cell)}</td>)}</tr>)}
+              {block.rows.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, index) => <td key={index} data-label={inlineText(block.header[index] ?? [])}>{renderInline(cell)}</td>)}</tr>)}
             </tbody>
           </table>
         </div>;
@@ -121,9 +121,9 @@ const ReleaseHistory = () => <div className="pb-article-table" role="region" ari
       </thead>
       <tbody>
         {planbanReleases.map(release => <tr key={release.version}>
-            <td><a href={releaseUrl(release)}>v{release.version}</a></td>
-            <td><time dateTime={release.published}>{formatDate(release.published)}</time></td>
-            <td>{release.summary}</td>
+            <td data-label="Version"><a href={releaseUrl(release)}>v{release.version}</a></td>
+            <td data-label="Released"><time dateTime={release.published}>{formatDate(release.published)}</time></td>
+            <td data-label="Summary">{release.summary}</td>
           </tr>)}
       </tbody>
     </table>

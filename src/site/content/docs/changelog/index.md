@@ -17,7 +17,7 @@ Releases are listed newest first. Each date is the day the release was published
 Planban v1.1.6, released on 26 September 2026, adds Claude Code desktop support, makes the agent's board-link handoff work the same way in every host, and resolves boards from linked git worktrees.
 
 - Planban installs as a Claude Code plugin, with six `/planban:` commands, the board in the browser pane, and a session-start hook.
-- Every MCP result that concerns a board carries a verified board link, so agents in any host return it without the skills.
+- MCP results that concern a board carry the board link, so agents in any host return it without the skills.
 - Sessions in a linked git worktree open the main checkout's board.
 
 Read the full notes on the [Planban v1.1.6](/docs/changelog/v1-1-6/) page.

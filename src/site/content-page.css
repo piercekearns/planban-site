@@ -307,6 +307,13 @@
     color: var(--pb-ink);
   }
 
+  /* Keep command, option and tool names whole; cells wrap between them, and
+     the wrapper scrolls when a table is wider than the screen. */
+  .pb-article-table code {
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
+
   .pb-article-table tbody tr:last-child td {
     border-bottom: 0;
   }
@@ -525,6 +532,67 @@
 
     .pb-docs-pager {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* Narrow screens: each table row becomes a block, the first cell as its
+       title and the other cells labelled with their column headings. */
+    .pb-article-table {
+      overflow-x: visible;
+    }
+
+    .pb-article-table table,
+    .pb-article-table tbody,
+    .pb-article-table tr,
+    .pb-article-table td {
+      display: block;
+    }
+
+    .pb-article-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    .pb-article-table tr {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--pb-divider-line);
+    }
+
+    .pb-article-table tbody tr:last-child {
+      border-bottom: 0;
+    }
+
+    .pb-article-table td {
+      min-width: 0;
+      padding: 0;
+      border-bottom: 0;
+    }
+
+    .pb-article-table td + td {
+      margin-top: 6px;
+    }
+
+    .pb-article-table td:first-child {
+      font-weight: 650;
+    }
+
+    .pb-article-table td + td:not(:empty)::before {
+      content: attr(data-label) ": ";
+      color: var(--pb-faint);
+      font-size: 12px;
+      font-weight: 720;
+      text-transform: uppercase;
+    }
+
+    .pb-article-table td:empty {
+      display: none;
+    }
+
+    .pb-article-table td + td code {
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
 
     .pb-docs-pager a.is-next {
