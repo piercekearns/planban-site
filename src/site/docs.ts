@@ -14,6 +14,10 @@ import itemsAndGroupsMeta from "./content/docs/items-and-groups.md?meta";
 import statusAndPriorityMeta from "./content/docs/status-and-priority.md?meta";
 import specsPlansNextActionsMeta from "./content/docs/specs-plans-next-actions.md?meta";
 import agentProtocolMeta from "./content/docs/agent-protocol.md?meta";
+import cliMeta from "./content/docs/cli.md?meta";
+import mcpToolsMeta from "./content/docs/mcp-tools.md?meta";
+import dataStorageMeta from "./content/docs/data-storage.md?meta";
+import gitWorktreesMeta from "./content/docs/git-worktrees.md?meta";
 
 export type DocsSectionId = "get-started" | "use-planban" | "reference" | "maintain" | "changelog";
 
@@ -64,7 +68,16 @@ export const docsSections: readonly DocsSection[] = [
       { id: "docs-agent-protocol", meta: agentProtocolMeta, sourceFile: "src/site/content/docs/agent-protocol.md", breadcrumbName: "Agent protocol" },
     ],
   },
-  { id: "reference", title: "Reference", pages: [] },
+  {
+    id: "reference",
+    title: "Reference",
+    pages: [
+      { id: "docs-cli", meta: cliMeta, sourceFile: "src/site/content/docs/cli.md", breadcrumbName: "CLI" },
+      { id: "docs-mcp-tools", meta: mcpToolsMeta, sourceFile: "src/site/content/docs/mcp-tools.md", breadcrumbName: "MCP tools" },
+      { id: "docs-data-storage", meta: dataStorageMeta, sourceFile: "src/site/content/docs/data-storage.md", breadcrumbName: "Data storage" },
+      { id: "docs-git-worktrees", meta: gitWorktreesMeta, sourceFile: "src/site/content/docs/git-worktrees.md", breadcrumbName: "Git worktrees" },
+    ],
+  },
   { id: "maintain", title: "Maintain", pages: [] },
   { id: "changelog", title: "Changelog", pages: [] },
 ];
