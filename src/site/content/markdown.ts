@@ -4,7 +4,9 @@
 // ships to visitors. It supports only what the page drafts use: front matter,
 // # to ### headings, paragraphs, - and 1. lists, fenced code, a standalone
 // image with an optional "*Caption: ...*" line, and inline code, **strong**,
-// *emphasis*, [links](url), and bare https:// URLs. A line of the form
+// *emphasis*, [links](url), and bare https:// URLs. GitHub-style pipe tables
+// (a header row, a | --- | separator row, then body rows) render as tables. A
+// line of the form
 // <!-- component: name --> places a site component (such as the generated
 // docs index) at that point in the page.
 
@@ -21,7 +23,8 @@ export type ContentBlock =
   | { type: "list"; ordered: boolean; items: InlineNode[][] }
   | { type: "code"; language: string; value: string }
   | { type: "figure"; src: string; alt: string; caption: InlineNode[] | null }
-  | { type: "component"; name: string };
+  | { type: "component"; name: string }
+  | { type: "table"; header: InlineNode[][]; rows: InlineNode[][][] };
 
 export interface ContentFrontMatter {
   title: string;
@@ -155,6 +158,33 @@ export function slugify(text: string): string {
     .replace(/\s+/gu, "-");
 }
 
+/** Splits a | a | b | table row into cells, ignoring pipes inside `code` or escaped as \\|. */
+function splitTableRow(line: string): string[] {
+  const body = line.trim().replace(/^\|/u, "").replace(/\|$/u, "");
+  const cells: string[] = [];
+  let cell = "";
+  let inCode = false;
+  for (let index = 0; index < body.length; index += 1) {
+    const char = body[index]!;
+    if (char === "\\" && body[index + 1] === "|") {
+      cell += "|";
+      index += 1;
+      continue;
+    }
+    if (char === "`") inCode = !inCode;
+    if (char === "|" && !inCode) {
+      cells.push(cell.trim());
+      cell = "";
+      continue;
+    }
+    cell += char;
+  }
+  cells.push(cell.trim());
+  return cells;
+}
+
+const tableSeparator = /^\|(?:\s*:?-{3,}:?\s*\|)+\s*$/u;
+
 export function parseContentDocument(source: string, file: string, options: ParseOptions = {}): ContentDocument {
   let text = source.replace(/\r\n/gu, "\n");
   text = text.replace(/\{\{(\w+)\}\}/gu, (token, name: string) => {
@@ -168,7 +198,7 @@ export function parseContentDocument(source: string, file: string, options: Pars
   const headingIds = new Set<string>();
   let index = 0;
 
-  const isBlockStart = (line: string) => /^(#{1,3} |```|- |\d+\. |!\[|<!-- component: )/u.test(line);
+  const isBlockStart = (line: string) => /^(#{1,3} |```|- |\d+\. |!\[|<!-- component: |\|)/u.test(line);
 
   while (index < lines.length) {
     const line = lines[index]!;
@@ -193,6 +223,20 @@ export function parseContentDocument(source: string, file: string, options: Pars
     if (component) {
       blocks.push({ type: "component", name: component[1]! });
       index += 1;
+      continue;
+    }
+
+    if (line.startsWith("|") && tableSeparator.test(lines[index + 1] ?? "")) {
+      const header = splitTableRow(line);
+      const rows: InlineNode[][][] = [];
+      index += 2;
+      while (index < lines.length && lines[index]!.startsWith("|")) {
+        const cells = splitTableRow(lines[index]!);
+        if (cells.length !== header.length) throw new Error(`${file}: table row has ${cells.length} cells, expected ${header.length}: ${lines[index]}`);
+        rows.push(cells.map(cell => parseInline(cell)));
+        index += 1;
+      }
+      blocks.push({ type: "table", header: header.map(cell => parseInline(cell)), rows });
       continue;
     }
 

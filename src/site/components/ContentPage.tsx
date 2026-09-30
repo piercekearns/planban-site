@@ -1,5 +1,5 @@
 import { type ReactNode, useState } from "react";
-import type { ContentBlock, ContentDocument, InlineNode } from "../content/markdown";
+import { type ContentBlock, type ContentDocument, type InlineNode, inlineText } from "../content/markdown";
 import { type SiteArticle, type SiteRoute, articleHeadline, siteRoutes } from "../routes";
 import { type DocsPage, docsIndexPage, docsNeighbours, docsSectionOf, docsSections } from "../docs";
 import { docsDocument } from "../docs-content";
@@ -77,6 +77,18 @@ function renderBlock(block: ContentBlock, key: number, headingOffset = 0): React
         </figure>;
     case "component":
       return <ContentComponent key={key} name={block.name} />;
+    case "table":
+      // The wrapper scrolls sideways on narrow screens, so it is focusable for keyboard users.
+      return <div key={key} className="pb-article-table" role="region" aria-label={`Table: ${block.header.map(cell => inlineText(cell)).join(", ")}`} tabIndex={0}>
+          <table>
+            <thead>
+              <tr>{block.header.map((cell, index) => <th key={index} scope="col">{renderInline(cell)}</th>)}</tr>
+            </thead>
+            <tbody>
+              {block.rows.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, index) => <td key={index}>{renderInline(cell)}</td>)}</tr>)}
+            </tbody>
+          </table>
+        </div>;
   }
 }
 
@@ -175,6 +187,7 @@ function linkedPaths(blocks: readonly ContentBlock[]): Set<string> {
   for (const block of blocks) {
     if (block.type === "paragraph" || block.type === "heading") visit(block.children);
     if (block.type === "list") block.items.forEach(visit);
+    if (block.type === "table") [block.header, ...block.rows].forEach(row => row.forEach(visit));
     if (block.type === "figure" && block.caption) visit(block.caption);
   }
   return paths;
