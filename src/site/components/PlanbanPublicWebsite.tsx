@@ -1,7 +1,9 @@
-import { type CSSProperties, type FormEvent, type PointerEvent, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type FormEvent, type PointerEvent, type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUp, Menu } from "lucide-react";
 import { DemoBoard, DemoItemDetail, HeroLiveDemo } from "./HeroLiveDemo";
 import { OutcomeJourney } from "./OutcomeJourney";
+import type { SiteRouteId } from "../routes";
+import { planbanReleaseUrl, planbanReleasesUrl, planbanVersion } from "../site-facts";
 const planbanLogoImages = {
   light: "/assets/card-stack-black.svg",
   dark: "/assets/card-stack-white.svg"
@@ -418,10 +420,12 @@ const BringPlansVisual = ({
     </div>
   </div>;
 
-const PrivacyPolicyPage = ({
-  theme
+const SubpageShell = ({
+  theme,
+  children
 }: {
   theme: "light" | "dark";
+  children: ReactNode;
 }) => <div className={`pb-site ${theme}`}>
     <div className="pb-ambient" aria-hidden="true" />
     <header className="pb-header-wrap is-visible is-top">
@@ -444,6 +448,15 @@ const PrivacyPolicyPage = ({
     </header>
 
     <main className="pb-privacy-page">
+      {children}
+    </main>
+  </div>;
+
+const PrivacyPolicyPage = ({
+  theme
+}: {
+  theme: "light" | "dark";
+}) => <SubpageShell theme={theme}>
       <section className="pb-privacy-shell glass">
         <p className="pb-kicker">Privacy</p>
         <h1>Privacy Policy</h1>
@@ -471,16 +484,52 @@ const PrivacyPolicyPage = ({
           </section>
         </div>
       </section>
-    </main>
-  </div>;
+    </SubpageShell>;
 
-export const PlanbanPublicWebsite = () => {
-  const [themeMode, setThemeMode] = useState<"system" | "light" | "dark">(() => {
-    if (typeof window === "undefined") return "system";
-    const savedTheme = window.localStorage.getItem(themeStorageKey);
-    return isThemeMode(savedTheme) ? savedTheme : "system";
-  });
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(() => typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+const NotFoundPage = ({
+  theme
+}: {
+  theme: "light" | "dark";
+}) => <SubpageShell theme={theme}>
+      <section className="pb-privacy-shell glass">
+        <p className="pb-kicker">404</p>
+        <h1>Page not found</h1>
+        <div className="pb-privacy-content">
+          <section>
+            <p>This page does not exist. <a href="/">Go to the Planban home page</a>.</p>
+          </section>
+        </div>
+      </section>
+    </SubpageShell>;
+
+type ThemeMode = "system" | "light" | "dark";
+// Layout effects do not run during server rendering; on the client they apply
+// the stored theme before the hydrated page is painted.
+const useClientLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+export const PlanbanPublicWebsite = ({
+  route = "home"
+}: {
+  route?: SiteRouteId;
+}) => {
+  // The server renders the system theme as light. The first client render
+  // matches it, then the stored or system theme is applied before paint.
+  const [themeMode, setThemeMode] = useState<ThemeMode>("system");
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+  const [themeReady, setThemeReady] = useState(false);
+  useClientLayoutEffect(() => {
+    try {
+      const savedTheme = window.localStorage.getItem(themeStorageKey);
+      if (isThemeMode(savedTheme)) setThemeMode(savedTheme);
+    } catch {
+      // Storage can be unavailable; the system theme still applies.
+    }
+    if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) setSystemTheme("dark");
+    setThemeReady(true);
+  }, []);
+  useClientLayoutEffect(() => {
+    if (themeReady) document.documentElement.classList.remove("pb-theme-pending");
+  }, [themeReady]);
   const [activeShot, setActiveShot] = useState(0);
   const [email, setEmail] = useState("");
   const [signupState, setSignupState] = useState<"idle" | "success" | "error" | "unconfigured" | "submitting">("idle");
@@ -525,11 +574,14 @@ export const PlanbanPublicWebsite = () => {
   const resolvedTheme = themeMode === "system" ? systemTheme : themeMode;
   const images = productImages[resolvedTheme];
   const selectedShot = demoShots[activeShot] ?? demoShots[0];
-  const isPrivacyPage = typeof window !== "undefined" && window.location.pathname.replace(/\/+$/u, "") === "/privacy";
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(themeStorageKey, themeMode);
-  }, [themeMode]);
+    if (!themeReady) return;
+    try {
+      window.localStorage.setItem(themeStorageKey, themeMode);
+    } catch {
+      // The chosen theme still applies for this visit.
+    }
+  }, [themeMode, themeReady]);
   useEffect(() => {
     if (typeof document === "undefined" || !mobileMenuOpen) return;
     const closeOnOutsidePointer = (event: globalThis.PointerEvent) => {
@@ -908,8 +960,11 @@ export const PlanbanPublicWebsite = () => {
     setCopyState("copied");
     window.setTimeout(() => setCopyState("idle"), 1500);
   }
-  if (isPrivacyPage) {
+  if (route === "privacy") {
     return <PrivacyPolicyPage theme={resolvedTheme} />;
+  }
+  if (route === "not-found") {
+    return <NotFoundPage theme={resolvedTheme} />;
   }
   return <div className={`pb-site ${resolvedTheme}`} style={{
     "--spot-x": `${pointer.x}%`,
@@ -943,7 +998,7 @@ export const PlanbanPublicWebsite = () => {
                 <MoonIcon />
               </button>
             </div>
-            <a className="pb-version-pill" href="https://github.com/piercekearns/planban/releases/tag/v1.1.6" aria-label="Planban v1.1.6 release notes">v1.1.6</a>
+            <a className="pb-version-pill" href={planbanReleaseUrl} aria-label={`Planban v${planbanVersion} release notes`}>v{planbanVersion}</a>
             <a className="pb-icon-button" href="https://github.com/piercekearns/planban" aria-label="Open Planban on GitHub">
               <GitHubIcon />
               <span>GitHub</span>
@@ -1174,9 +1229,9 @@ export const PlanbanPublicWebsite = () => {
           <a href="#install">Install</a>
           <a href="#features">Features</a>
           <a href="#future">Hosts</a>
-          <a href="https://github.com/piercekearns/planban/releases">Changelog · v1.1.6</a>
+          <a href={planbanReleasesUrl}>Changelog · v{planbanVersion}</a>
           <a href="https://github.com/piercekearns/planban/blob/main/PRODUCT.md">Product constitution</a>
-          <a href="/privacy">Privacy</a>
+          <a href="/privacy/">Privacy</a>
           <a href="https://github.com/piercekearns/planban/blob/main/LICENSE">MIT licence</a>
           <a className="pb-footer-credit" href="https://backpacker.gr/fonts/">Hellenica by backpacker.gr</a>
         </div>
