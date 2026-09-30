@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Runs after the client and server Vite builds. Renders every route in
-// src/site/routes.ts to static HTML in dist/site and writes sitemap.xml.
+// src/site/routes.ts to static HTML in dist/site and writes sitemap.xml and
+// llms.txt.
 import { execFileSync } from "node:child_process";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
@@ -12,7 +13,7 @@ const serverDir = resolve(repoRoot, "dist/site-server");
 const rootMarkup = '<div id="root"></div>';
 const headMarker = "<!--app-head-->";
 
-const { renderRoute, siteRoutes, canonicalUrl, planbanFeatureList } = await import(
+const { renderRoute, siteRoutes, canonicalUrl, planbanFeatureList, buildLlmsTxt } = await import(
   pathToFileURL(resolve(serverDir, "entry-server.js")).href
 );
 
@@ -67,10 +68,16 @@ const sitemapEntries = siteRoutes
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries.join("\n")}\n</urlset>\n`;
 await writeFile(resolve(siteDir, "sitemap.xml"), sitemap);
 
+// llms.txt is generated from the docs registry. It is not listed in the
+// sitemap, and _headers serves it with X-Robots-Tag: noindex.
+const llmsTxt = buildLlmsTxt();
+await writeFile(resolve(siteDir, "llms.txt"), llmsTxt);
+
 await rm(serverDir, { recursive: true, force: true });
 
 process.stdout.write(JSON.stringify({
   ok: true,
   pages: siteRoutes.map(route => `dist/site/${route.outputFile}`),
   sitemap: sitemapEntries.length,
+  llmsTxtLinks: llmsTxt.split("\n").filter(line => line.startsWith("- [")).length,
 }, null, 2) + "\n");
