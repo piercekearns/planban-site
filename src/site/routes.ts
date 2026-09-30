@@ -11,8 +11,26 @@ import {
   siteOrigin,
   siteUrl,
 } from "./site-facts";
+import type { ContentDocument } from "./content/markdown";
+import claudeCodePage from "./content/claude-code.md";
+import codexPage from "./content/codex.md";
+import agentNativeKanbanPage from "./content/what-is-an-agent-native-kanban-board.md";
 
-export type SiteRouteId = "home" | "privacy" | "not-found";
+export type SiteRouteId =
+  | "home"
+  | "privacy"
+  | "not-found"
+  | "claude-code"
+  | "codex"
+  | "what-is-an-agent-native-kanban-board";
+
+export interface SiteArticle {
+  document: ContentDocument;
+  /** Short page name for the visible breadcrumb and BreadcrumbList. */
+  breadcrumbName: string;
+  /** Screenshot used as the TechArticle image. */
+  image: string;
+}
 
 export interface SiteRoute {
   id: SiteRouteId;
@@ -31,6 +49,8 @@ export interface SiteRoute {
   sourceFiles: readonly string[];
   preloadDisplayFont?: boolean;
   structuredData?: boolean;
+  /** Content pages rendered from src/site/content by ContentPage. */
+  article?: SiteArticle;
 }
 
 const sharedPageSources = [
@@ -38,6 +58,35 @@ const sharedPageSources = [
   "src/site/routes.ts",
   "src/site/site-facts.ts",
 ] as const;
+
+const articleSources = [
+  ...sharedPageSources,
+  "src/site/components/ContentPage.tsx",
+  "src/site/content-page.css",
+] as const;
+
+function articleRoute(
+  id: SiteRouteId,
+  document: ContentDocument,
+  sourceFile: string,
+  options: { breadcrumbName: string; image: string; socialTitle: string },
+): SiteRoute {
+  const { path, title, description } = document.frontMatter;
+  if (!/^\/[a-z0-9-]+\/$/u.test(path)) throw new Error(`${sourceFile}: path must be folder-style, like /codex/.`);
+  return {
+    id,
+    path,
+    outputFile: `${path.slice(1)}index.html`,
+    title,
+    description,
+    socialTitle: options.socialTitle,
+    ogDescription: description,
+    twitterDescription: description,
+    indexable: true,
+    sourceFiles: [...articleSources, sourceFile],
+    article: { document, breadcrumbName: options.breadcrumbName, image: options.image },
+  };
+}
 
 export const siteRoutes: readonly SiteRoute[] = [
   {
@@ -70,6 +119,21 @@ export const siteRoutes: readonly SiteRoute[] = [
     indexable: true,
     sourceFiles: sharedPageSources,
   },
+  articleRoute("claude-code", claudeCodePage, "src/site/content/claude-code.md", {
+    breadcrumbName: "Claude Code",
+    image: `${siteOrigin}/assets/planban-board-light.png`,
+    socialTitle: "Planban for Claude Code",
+  }),
+  articleRoute("codex", codexPage, "src/site/content/codex.md", {
+    breadcrumbName: "Codex",
+    image: `${siteOrigin}/assets/planban-board-light.png`,
+    socialTitle: "Planban for Codex",
+  }),
+  articleRoute("what-is-an-agent-native-kanban-board", agentNativeKanbanPage, "src/site/content/what-is-an-agent-native-kanban-board.md", {
+    breadcrumbName: "Agent-native Kanban",
+    image: `${siteOrigin}/assets/planban-card-detail-light.png`,
+    socialTitle: "What is an agent-native Kanban board?",
+  }),
   {
     id: "not-found",
     path: "/404.html",
@@ -103,19 +167,21 @@ function escapeHtml(value: string): string {
 const organizationId = `${siteOrigin}/#org`;
 const websiteId = `${siteOrigin}/#website`;
 
+const organizationNode = {
+  "@type": "Organization",
+  "@id": organizationId,
+  name: "Planban",
+  url: siteUrl,
+  logo: planbanLogoUrl,
+  description: planbanCanonicalDescription,
+  sameAs: [planbanRepositoryUrl, planbanXProfileUrl],
+} as const;
+
 export function buildStructuredData() {
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "Organization",
-        "@id": organizationId,
-        name: "Planban",
-        url: siteUrl,
-        logo: planbanLogoUrl,
-        description: planbanCanonicalDescription,
-        sameAs: [planbanRepositoryUrl, planbanXProfileUrl],
-      },
+      organizationNode,
       {
         "@type": "WebSite",
         "@id": websiteId,
@@ -146,6 +212,45 @@ export function buildStructuredData() {
   };
 }
 
+/** Headline of a content page: its H1. */
+export function articleHeadline(article: SiteArticle): string {
+  const heading = article.document.blocks.find(block => block.type === "heading" && block.level === 1);
+  if (!heading || heading.type !== "heading") throw new Error(`${article.document.frontMatter.path} has no H1.`);
+  return heading.text;
+}
+
+export function buildArticleStructuredData(route: SiteRoute, article: SiteArticle) {
+  const pageUrl = canonicalUrl(route);
+  const { description, updated } = article.document.frontMatter;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      organizationNode,
+      {
+        "@type": "TechArticle",
+        "@id": `${pageUrl}#article`,
+        headline: articleHeadline(article),
+        description,
+        image: article.image,
+        datePublished: updated,
+        dateModified: updated,
+        author: { "@id": organizationId },
+        publisher: { "@id": organizationId },
+        mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+        isPartOf: { "@id": websiteId },
+        inLanguage: "en-GB",
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+          { "@type": "ListItem", position: 2, name: article.breadcrumbName, item: pageUrl },
+        ],
+      },
+    ],
+  };
+}
+
 /** Serialises JSON for an inline script without allowing it to close the tag. */
 function inlineJson(value: unknown): string {
   return JSON.stringify(value)
@@ -162,7 +267,7 @@ export function renderRouteHead(route: SiteRoute): string {
     route.indexable ? null : `<meta name="robots" content="noindex" />`,
     `<meta property="og:title" content="${escapeHtml(route.socialTitle)}" />`,
     `<meta property="og:description" content="${escapeHtml(route.ogDescription)}" />`,
-    `<meta property="og:type" content="website" />`,
+    `<meta property="og:type" content="${route.article ? "article" : "website"}" />`,
     route.indexable ? `<meta property="og:url" content="${pageUrl}" />` : null,
     `<meta property="og:image" content="${planbanSocialImageUrl}" />`,
     `<meta property="og:image:type" content="image/png" />`,
@@ -178,6 +283,7 @@ export function renderRouteHead(route: SiteRoute): string {
     route.indexable ? `<link rel="canonical" href="${pageUrl}" />` : null,
     route.preloadDisplayFont ? `<link rel="preload" href="/assets/fonts/Hellenica.otf" as="font" type="font/otf" crossorigin />` : null,
     route.structuredData ? `<script type="application/ld+json">${inlineJson(buildStructuredData())}</script>` : null,
+    route.article ? `<script type="application/ld+json">${inlineJson(buildArticleStructuredData(route, route.article))}</script>` : null,
   ];
   return tags.filter((tag): tag is string => tag !== null).join("\n    ");
 }

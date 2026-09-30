@@ -2,7 +2,9 @@ import { type CSSProperties, type FormEvent, type PointerEvent, type ReactNode, 
 import { ArrowUp, Menu } from "lucide-react";
 import { DemoBoard, DemoItemDetail, HeroLiveDemo } from "./HeroLiveDemo";
 import { OutcomeJourney } from "./OutcomeJourney";
-import type { SiteRouteId } from "../routes";
+import { CheckIcon, CopyIcon, copyTextToClipboard } from "./copy";
+import { type SiteRouteId, findSiteRoute } from "../routes";
+import { ContentPage } from "./ContentPage";
 import { planbanReleaseUrl, planbanReleasesUrl, planbanVersion } from "../site-facts";
 const planbanLogoImages = {
   light: "/assets/card-stack-black.svg",
@@ -252,13 +254,6 @@ const PlanbanBrandLockup = ({
   theme: "light" | "dark";
   loading?: "eager" | "lazy";
 }) => <img className="pb-brand-lockup" src={planbanBrandImages[theme]} alt="" loading={loading} decoding="async" />;
-const CopyIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-  </svg>;
-const CheckIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m5 12 4.5 4.5L19 7" />
-  </svg>;
 const SystemIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M4.75 5A2.75 2.75 0 0 0 2 7.75v7.5A2.75 2.75 0 0 0 4.75 18h5.75v1.5H8a.75.75 0 0 0 0 1.5h8a.75.75 0 0 0 0-1.5h-2.5V18h5.75A2.75 2.75 0 0 0 22 15.25v-7.5A2.75 2.75 0 0 0 19.25 5H4.75Zm0 1.5h14.5c.69 0 1.25.56 1.25 1.25v7.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-7.5c0-.69.56-1.25 1.25-1.25Z" fill="currentColor" />
   </svg>;
@@ -450,6 +445,18 @@ const SubpageShell = ({
     <main className="pb-privacy-page">
       {children}
     </main>
+
+    <footer className="pb-subpage-footer">
+      <nav className="pb-subpage-footer-links" aria-label="Footer">
+        <a href="/">Home</a>
+        <a href="/claude-code/">Planban for Claude Code</a>
+        <a href="/codex/">Planban for Codex</a>
+        <a href="/what-is-an-agent-native-kanban-board/">What is agent-native Kanban?</a>
+        <a href={planbanReleasesUrl}>Changelog · v{planbanVersion}</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="https://github.com/piercekearns/planban/blob/main/LICENSE">MIT licence</a>
+      </nav>
+    </footer>
   </div>;
 
 const PrivacyPolicyPage = ({
@@ -936,25 +943,6 @@ export const PlanbanPublicWebsite = ({
   function leavePointer() {
     asciiPointer.current.active = false;
   }
-  async function copyTextToClipboard(text: string) {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const copyTarget = document.createElement("textarea");
-        copyTarget.value = text;
-        copyTarget.setAttribute("readonly", "");
-        copyTarget.style.position = "fixed";
-        copyTarget.style.opacity = "0";
-        document.body.appendChild(copyTarget);
-        copyTarget.select();
-        document.execCommand("copy");
-        document.body.removeChild(copyTarget);
-      }
-    } catch {
-      // The visible success affordance still confirms the user's copy intent.
-    }
-  }
   async function copyInstallCommand() {
     await copyTextToClipboard(activeInstallPrompt);
     setCopyState("copied");
@@ -965,6 +953,12 @@ export const PlanbanPublicWebsite = ({
   }
   if (route === "not-found") {
     return <NotFoundPage theme={resolvedTheme} />;
+  }
+  const contentRoute = findSiteRoute(route);
+  if (contentRoute?.article) {
+    return <SubpageShell theme={resolvedTheme}>
+        <ContentPage route={contentRoute} />
+      </SubpageShell>;
   }
   return <div className={`pb-site ${resolvedTheme}`} style={{
     "--spot-x": `${pointer.x}%`,
