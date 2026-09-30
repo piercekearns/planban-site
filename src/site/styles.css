@@ -3223,4 +3223,21 @@ body {
       grid-template-columns: minmax(0, 1fr);
     }
   }
+
+  /* The features frame background as AVIF or WebP where typed image-set() is
+     supported. A custom property holding an unsupported image-set() would
+     compute to no image at all, so the JPEG values above stay the default. */
+  @supports (background-image: image-set(url("x.avif") type("image/avif"))) {
+    .pb-grid-frame-features {
+      --pb-proof-bg-light: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-16x9.jpg") type("image/jpeg"));
+      --pb-proof-bg-dark: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-16x9.jpg") type("image/jpeg"));
+    }
+
+    @media (max-width: 980px) {
+      .pb-grid-frame-features {
+        --pb-proof-bg-light: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-4x5.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-4x5.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-light-4x5.jpg") type("image/jpeg"));
+        --pb-proof-bg-dark: image-set(url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-4x5.avif") type("image/avif"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-4x5.webp") type("image/webp"), url("/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-dark-4x5.jpg") type("image/jpeg"));
+      }
+    }
+  }
 }

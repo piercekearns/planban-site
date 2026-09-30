@@ -16,10 +16,15 @@
         } catch (error) {}
         var root = document.documentElement;
         if (window.location.pathname === "/" || window.location.pathname === "/index.html") {
+          // Same file hero-live.css picks: AVIF, 3:4 crop on phones. Browsers
+          // without AVIF ignore the typed preload and use the CSS fallback.
+          var phone = window.matchMedia("(max-width: 980px)").matches;
           var preload = document.createElement("link");
           preload.rel = "preload";
           preload.as = "image";
-          preload.href = "/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-" + (dark ? "dark" : "light") + "-16x9.jpg";
+          preload.type = "image/avif";
+          preload.setAttribute("fetchpriority", "high");
+          preload.href = "/assets/ultramock-bg/planban-bg-hero-codex-field-codexgradient-" + (dark ? "dark" : "light") + (phone ? "-3x4" : "-16x9") + ".avif";
           document.head.appendChild(preload);
         }
         if (!dark) return;
