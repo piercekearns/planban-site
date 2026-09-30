@@ -2,7 +2,7 @@ import react from "@vitejs/plugin-react";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
-import { parseContentDocument } from "./src/site/content/markdown.ts";
+import { contentMeta, parseContentDocument } from "./src/site/content/markdown.ts";
 import { planbanVersion } from "./src/site/site-facts.ts";
 
 function resolveSiteCommit() {
@@ -35,14 +35,19 @@ export default defineConfig(({ isSsrBuild }) => ({
       },
     },
     {
-      // Page copy lives in src/site/content/*.md. Each import becomes a small
-      // JSON block tree at build time, rendered by ContentPage.
+      // Page copy lives in src/site/content/**/*.md (docs pages under
+      // content/docs/). Each import becomes a small JSON block tree at build
+      // time, rendered by ContentPage.
       name: "planban-site-content-markdown",
       enforce: "pre",
       transform(source, id) {
-        if (!/\/src\/site\/content\/[^/]+\.md$/u.test(id)) return null;
+        // "page.md?meta" yields only the front matter and headline, so
+        // navigation can list pages without bundling their full text.
+        const match = /\/src\/site\/content\/(?:[a-z0-9-]+\/)*[^/]+\.md(\?meta)?$/u.exec(id);
+        if (!match) return null;
         const document = parseContentDocument(source, id, { tokens: { planbanVersion } });
-        return { code: `export default ${JSON.stringify(document)};`, map: null };
+        const value = match[1] ? contentMeta(document, id) : document;
+        return { code: `export default ${JSON.stringify(value)};`, map: null };
       },
     },
   ],

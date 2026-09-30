@@ -24,9 +24,17 @@ const requiredFiles = [
   "dist/site/claude-code/index.html",
   "dist/site/codex/index.html",
   "dist/site/what-is-an-agent-native-kanban-board/index.html",
+  "dist/site/docs/index.html",
+  "dist/site/docs/install-codex/index.html",
+  "dist/site/docs/install-claude-code/index.html",
+  "dist/site/docs/cli/index.html",
+  "dist/site/docs/mcp-tools/index.html",
+  "dist/site/docs/changelog/index.html",
+  "dist/site/docs/changelog/v1-1-6/index.html",
   "dist/site/404.html",
   "dist/site/robots.txt",
   "dist/site/sitemap.xml",
+  "dist/site/llms.txt",
   "dist/site/_headers",
 ];
 
@@ -148,9 +156,84 @@ for (const root of roots) {
   }
 }
 
+// Built-output checks: every sitemap URL has a page, every internal link and
+// #anchor resolves, and llms.txt lists exactly the indexable docs pages.
+const siteDir = resolve(repoRoot, "dist/site");
+const siteOrigin = "https://planban.ai";
+let checkedLinks = 0;
+
+function outputFileForPath(pathname) {
+  const clean = decodeURIComponent(pathname);
+  if (clean.endsWith("/")) return join(siteDir, clean, "index.html");
+  return join(siteDir, clean);
+}
+
+if (await pathExists(join(siteDir, "sitemap.xml"))) {
+  const sitemap = await readFile(join(siteDir, "sitemap.xml"), "utf8");
+  const sitemapPaths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/gu)].map((match) => new URL(match[1]).pathname);
+  for (const path of sitemapPaths) {
+    if (!(await pathExists(outputFileForPath(path)))) findings.push({ type: "sitemap-url-without-page", path });
+  }
+
+  const htmlFiles = (await walk(siteDir))
+    .filter((entry) => entry.type === "file" && entry.path.endsWith(".html"))
+    .map((entry) => entry.absolutePath);
+  const idsByFile = new Map();
+  async function idsIn(file) {
+    if (!idsByFile.has(file)) {
+      const html = await readFile(file, "utf8");
+      idsByFile.set(file, new Set([...html.matchAll(/\sid="([^"]+)"/gu)].map((match) => match[1])));
+    }
+    return idsByFile.get(file);
+  }
+  for (const file of htmlFiles) {
+    const html = await readFile(file, "utf8");
+    for (const match of html.matchAll(/\shref="([^"]+)"/gu)) {
+      const href = match[1].replaceAll("&amp;", "&");
+      let target;
+      if (href.startsWith("#")) target = new URL(href, `${siteOrigin}/${relative(siteDir, file)}`);
+      else if (href.startsWith("/") && !href.startsWith("//")) target = new URL(href, siteOrigin);
+      else if (href.startsWith(`${siteOrigin}/`)) target = new URL(href);
+      else continue;
+      checkedLinks += 1;
+      const targetFile = href.startsWith("#") ? file : outputFileForPath(target.pathname);
+      if (!(await pathExists(targetFile))) {
+        findings.push({ type: "broken-internal-link", path: displayPath(file), href });
+        continue;
+      }
+      const anchor = decodeURIComponent(target.hash.slice(1));
+      if (anchor && targetFile.endsWith(".html") && !(await idsIn(targetFile)).has(anchor)) {
+        findings.push({ type: "missing-anchor", path: displayPath(file), href });
+      }
+    }
+  }
+
+  const llmsPath = join(siteDir, "llms.txt");
+  if (await pathExists(llmsPath)) {
+    const llms = await readFile(llmsPath, "utf8");
+    if (!/^# .+\n\n> .+/u.test(llms)) findings.push({ type: "llms-txt-format", path: "dist/site/llms.txt", rule: "H1 then blockquote summary" });
+    const llmsPaths = new Set([...llms.matchAll(/\]\((https:\/\/planban\.ai[^)\s]*)\)/gu)].map((match) => new URL(match[1]).pathname));
+    const indexable = new Set(sitemapPaths);
+    for (const path of llmsPaths) {
+      if (!indexable.has(path)) findings.push({ type: "llms-txt-link-not-indexable", path });
+    }
+    for (const path of sitemapPaths.filter((candidate) => candidate.startsWith("/docs/"))) {
+      if (!llmsPaths.has(path)) findings.push({ type: "docs-page-missing-from-llms-txt", path });
+    }
+  }
+}
+
+// House style: no em dashes in page copy.
+for (const entry of await walk(resolve(repoRoot, "src/site/content"))) {
+  if (entry.type !== "file" || !entry.path.endsWith(".md")) continue;
+  if ((await readFile(entry.absolutePath, "utf8")).includes("\u2014")) {
+    findings.push({ type: "style-em-dash", path: entry.path });
+  }
+}
+
 if (findings.length > 0) {
   process.stderr.write(JSON.stringify({ ok: false, roots: roots.map(displayPath), findings }, null, 2) + "\n");
   process.exitCode = 1;
 } else {
-  process.stdout.write(JSON.stringify({ ok: true, roots: roots.map(displayPath), checkedRequiredFiles: requiredFiles.length }, null, 2) + "\n");
+  process.stdout.write(JSON.stringify({ ok: true, roots: roots.map(displayPath), checkedRequiredFiles: requiredFiles.length, checkedInternalLinks: checkedLinks }, null, 2) + "\n");
 }

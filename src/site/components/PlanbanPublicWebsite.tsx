@@ -6,7 +6,7 @@ import { CheckIcon, CopyIcon, copyTextToClipboard } from "./copy";
 import { type SiteRouteId, findSiteRoute } from "../routes";
 import homeFaq from "../content/home-faq.md";
 import { ContentPage, QuestionList } from "./ContentPage";
-import { planbanReleaseUrl, planbanReleasesUrl, planbanVersion } from "../site-facts";
+import { planbanReleaseUrl, planbanVersion } from "../site-facts";
 const planbanLogoImages = {
   light: "/assets/card-stack-black.svg",
   dark: "/assets/card-stack-white.svg"
@@ -235,6 +235,8 @@ const hostPlatforms = [{
   status: "Via MCP",
   tone: "neutral",
   copy: "Same tools; the board opens as a link. Cursor and others fit here.",
+  href: "/docs/other-mcp-hosts/",
+  linkLabel: "MCP host guide",
   icon: <span className="pb-platform-text-icon" aria-hidden="true">MCP</span>
 }, {
   title: "Online Mode",
@@ -437,6 +439,7 @@ const SubpageShell = ({
           <a href="/#install">Install</a>
           <a href="/#features">Features</a>
           <a href="/#future">Hosts</a>
+          <a href="/docs/">Docs</a>
           <a href="/#faq">FAQ</a>
         </nav>
         <div className="pb-header-actions">
@@ -458,8 +461,9 @@ const SubpageShell = ({
         <a href="/claude-code/">Planban for Claude Code</a>
         <a href="/codex/">Planban for Codex</a>
         <a href="/what-is-an-agent-native-kanban-board/">What is agent-native Kanban?</a>
+        <a href="/docs/">Docs</a>
         <a href="/#faq">FAQ</a>
-        <a href={planbanReleasesUrl}>Changelog · v{planbanVersion}</a>
+        <a href="/docs/changelog/">Changelog · v{planbanVersion}</a>
         <a href="/privacy/">Privacy</a>
         <a href="https://github.com/piercekearns/planban/blob/main/LICENSE">MIT licence</a>
       </nav>
@@ -986,6 +990,7 @@ export const PlanbanPublicWebsite = ({
             <a href="#features">Features</a>
             <a href="#loop">How it works</a>
             <a href="#future">Hosts</a>
+            <a href="/docs/">Docs</a>
             <a href="#faq">FAQ</a>
           </nav>
           <div className="pb-header-actions">
@@ -1014,6 +1019,7 @@ export const PlanbanPublicWebsite = ({
             <a href="#install" onClick={() => setMobileMenuOpen(false)}>Install</a>
             <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
             <a href="#future" onClick={() => setMobileMenuOpen(false)}>Hosts</a>
+            <a href="/docs/" onClick={() => setMobileMenuOpen(false)}>Docs</a>
             <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
             <span className="pb-menu-divider" aria-hidden="true" />
             <a href="#updates" onClick={() => setMobileMenuOpen(false)}>Keep up to date</a>
@@ -1247,7 +1253,8 @@ export const PlanbanPublicWebsite = ({
           <a href="/claude-code/">Planban for Claude Code</a>
           <a href="/codex/">Planban for Codex</a>
           <a href="/what-is-an-agent-native-kanban-board/">What is agent-native Kanban?</a>
-          <a href={planbanReleasesUrl}>Changelog · v{planbanVersion}</a>
+          <a href="/docs/">Docs</a>
+          <a href="/docs/changelog/">Changelog · v{planbanVersion}</a>
           <a href="https://github.com/piercekearns/planban/blob/main/PRODUCT.md">Product constitution</a>
           <a href="/privacy/">Privacy</a>
           <a href="https://github.com/piercekearns/planban/blob/main/LICENSE">MIT licence</a>

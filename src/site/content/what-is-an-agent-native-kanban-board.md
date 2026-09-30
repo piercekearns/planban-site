@@ -34,7 +34,7 @@ Planban uses a small, fixed vocabulary. It is strict about what each term means 
 - **Plan.** How the work will be carried out and verified, when the work is complex enough to need one.
 - **Next action.** The one thing that happens now, and who does it.
 
-These layers keep the top of the board readable. You see concise cards first. Detail appears when you open an Item.
+These layers keep the top of the board readable. You see concise cards first. Detail appears when you open an Item. The Planban docs explain [Items and Groups](/docs/items-and-groups/) in full.
 
 ![An open Planban Group showing its Status, next action, objective, Spec and Plan tabs, and its Items listed by Status](/assets/planban-card-detail-light.png)
 

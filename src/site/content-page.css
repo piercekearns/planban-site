@@ -160,12 +160,13 @@
     scrollbar-width: thin;
   }
 
-  .pb-article-code.is-text pre {
+  .pb-article-code.is-text pre,
+  .pb-article-code.is-output pre {
     white-space: pre-wrap;
     word-break: break-word;
   }
 
-  .pb-article-code.is-bash pre {
+  .pb-article-code:not(.is-text, .is-output) pre {
     white-space: pre;
     padding-right: 64px;
   }
@@ -254,6 +255,164 @@
   .pb-article .pb-article-related a:hover {
     border-color: color-mix(in oklab, var(--pb-codex) 42%, var(--pb-line));
     background: var(--pb-codex-soft);
+  }
+
+  /* Pipe tables, scrolling sideways on narrow screens. */
+  .pb-article-table {
+    margin: 4px 0 18px;
+    overflow-x: auto;
+    border: 1px solid var(--pb-line);
+    border-radius: var(--pb-radius-accent-card);
+    scrollbar-color: var(--pb-scrollbar-thumb) var(--pb-scrollbar-track);
+    scrollbar-width: thin;
+  }
+
+  .pb-article-table:focus-visible {
+    outline: 2px solid var(--pb-codex);
+    outline-offset: 2px;
+  }
+
+  .pb-article-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .pb-article-table th,
+  .pb-article-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--pb-divider-line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .pb-article-table th {
+    background: color-mix(in oklab, var(--pb-glass) 88%, transparent);
+    color: var(--pb-ink);
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  .pb-article-table td {
+    color: var(--pb-muted);
+    min-width: 12ch;
+  }
+
+  .pb-article-table td:has(> time) {
+    white-space: nowrap;
+  }
+
+  .pb-article-table td:first-child {
+    color: var(--pb-ink);
+  }
+
+  /* Keep command, option and tool names whole; cells wrap between them, and
+     the wrapper scrolls when a table is wider than the screen. */
+  .pb-article-table code {
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
+
+  .pb-article-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  /* Docs: generated index, previous/next links, and section navigation. */
+  .pb-docs-index {
+    display: grid;
+    gap: 26px;
+    margin: 8px 0 4px;
+  }
+
+  .pb-docs-index h3 {
+    margin: 0 0 10px;
+    color: var(--pb-ink);
+    font-size: 13px;
+    font-weight: 720;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pb-article-body .pb-docs-index ul {
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-docs-index li {
+    display: grid;
+    gap: 2px;
+  }
+
+  .pb-article .pb-docs-index a {
+    font-weight: 650;
+  }
+
+  .pb-docs-index li span {
+    color: var(--pb-muted);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .pb-docs-pager {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .pb-article .pb-docs-pager a {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border: 1px solid var(--pb-line);
+    border-radius: 12px;
+    background: color-mix(in oklab, var(--pb-glass) 80%, transparent);
+    color: var(--pb-ink);
+    font-size: 15px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .pb-article .pb-docs-pager a:hover {
+    border-color: color-mix(in oklab, var(--pb-codex) 42%, var(--pb-line));
+    background: var(--pb-codex-soft);
+  }
+
+  .pb-docs-pager a.is-next {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .pb-docs-pager small {
+    color: var(--pb-faint);
+    font-size: 12px;
+    font-weight: 720;
+    text-transform: uppercase;
+  }
+
+  .pb-docs-section-nav p {
+    margin: 0 0 10px;
+    color: var(--pb-faint);
+    font-size: 12px;
+    font-weight: 720;
+    text-transform: uppercase;
+  }
+
+  .pb-docs-section-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+  }
+
+  .pb-docs-section-nav [aria-current="page"] {
+    color: var(--pb-ink);
+    font-weight: 650;
   }
 
   /* Footer on subpages */
@@ -369,6 +528,75 @@
 
     .pb-article-header > .pb-article-lede {
       font-size: 17px;
+    }
+
+    .pb-docs-pager {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* Narrow screens: each table row becomes a block, the first cell as its
+       title and the other cells labelled with their column headings. */
+    .pb-article-table {
+      overflow-x: visible;
+    }
+
+    .pb-article-table table,
+    .pb-article-table tbody,
+    .pb-article-table tr,
+    .pb-article-table td {
+      display: block;
+    }
+
+    .pb-article-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    .pb-article-table tr {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--pb-divider-line);
+    }
+
+    .pb-article-table tbody tr:last-child {
+      border-bottom: 0;
+    }
+
+    .pb-article-table td {
+      min-width: 0;
+      padding: 0;
+      border-bottom: 0;
+    }
+
+    .pb-article-table td + td {
+      margin-top: 6px;
+    }
+
+    .pb-article-table td:first-child {
+      font-weight: 650;
+    }
+
+    .pb-article-table td + td:not(:empty)::before {
+      content: attr(data-label) ": ";
+      color: var(--pb-faint);
+      font-size: 12px;
+      font-weight: 720;
+      text-transform: uppercase;
+    }
+
+    .pb-article-table td:empty {
+      display: none;
+    }
+
+    .pb-article-table td + td code {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .pb-docs-pager a.is-next {
+      grid-column: 1;
     }
   }
 }

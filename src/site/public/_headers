@@ -14,3 +14,9 @@
 
 /sitemap.xml
   Cache-Control: public, max-age=3600
+
+# Generated for agents from the docs registry; fetchable, but kept out of
+# search results.
+/llms.txt
+  X-Robots-Tag: noindex
+  Cache-Control: public, max-age=3600

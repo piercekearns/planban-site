@@ -1,6 +1,9 @@
 import { type ReactNode, useState } from "react";
-import type { ContentBlock, ContentDocument, InlineNode } from "../content/markdown";
-import { type SiteRoute, articleHeadline, siteRoutes } from "../routes";
+import { type ContentBlock, type ContentDocument, type InlineNode, inlineText } from "../content/markdown";
+import { type SiteArticle, type SiteRoute, articleHeadline, siteRoutes } from "../routes";
+import { type DocsPage, docsIndexPage, docsNeighbours, docsSectionOf, docsSections } from "../docs";
+import { docsDocument } from "../docs-content";
+import { planbanReleases, releaseUrl } from "../releases";
 import { planbanVersion } from "../site-facts";
 import { CheckIcon, CopyIcon, copyTextToClipboard } from "./copy";
 import "../content-page.css";
@@ -38,7 +41,7 @@ const CodeBlock = ({
   value: string;
 }) => {
   const [copied, setCopied] = useState(false);
-  const label = language === "bash" ? "commands" : "prompt";
+  const label = language === "text" ? "prompt" : language === "bash" || language === "powershell" ? "commands" : language === "output" ? "output" : "code";
   async function copy() {
     await copyTextToClipboard(value);
     setCopied(true);
@@ -73,7 +76,106 @@ function renderBlock(block: ContentBlock, key: number, headingOffset = 0): React
           <img src={block.src} alt={block.alt} width={1280} height={720} loading="lazy" decoding="async" />
           {block.caption ? <figcaption>{renderInline(block.caption)}</figcaption> : null}
         </figure>;
+    case "component":
+      return <ContentComponent key={key} name={block.name} />;
+    case "table":
+      // The wrapper scrolls sideways on narrow screens, so it is focusable for keyboard users.
+      return <div key={key} className="pb-article-table" role="region" aria-label={`Table: ${block.header.map(cell => inlineText(cell)).join(", ")}`} tabIndex={0}>
+          <table>
+            <thead>
+              <tr>{block.header.map((cell, index) => <th key={index} scope="col">{renderInline(cell)}</th>)}</tr>
+            </thead>
+            <tbody>
+              {block.rows.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, index) => <td key={index} data-label={inlineText(block.header[index] ?? [])}>{renderInline(cell)}</td>)}</tr>)}
+            </tbody>
+          </table>
+        </div>;
   }
+}
+
+/** Site components that Markdown places with <!-- component: name -->. */
+const ContentComponent = ({
+  name
+}: {
+  name: string;
+}) => {
+  switch (name) {
+    case "docs-index":
+      return <DocsIndexList />;
+    case "release-history":
+      return <ReleaseHistory />;
+    default:
+      throw new Error(`Unknown content component: ${name}`);
+  }
+};
+
+/** The changelog table, generated from src/site/releases.ts. */
+const ReleaseHistory = () => <div className="pb-article-table" role="region" aria-label="Planban releases" tabIndex={0}>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Version</th>
+          <th scope="col">Released</th>
+          <th scope="col">Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        {planbanReleases.map(release => <tr key={release.version}>
+            <td data-label="Version"><a href={releaseUrl(release)}>v{release.version}</a></td>
+            <td data-label="Released"><time dateTime={release.published}>{formatDate(release.published)}</time></td>
+            <td data-label="Summary">{release.summary}</td>
+          </tr>)}
+      </tbody>
+    </table>
+  </div>;
+
+/** The docs index link list, generated from the docs registry. */
+const DocsIndexList = () => <div className="pb-docs-index">
+    {docsSections.filter(section => section.pages.length > 0).map(section => <section key={section.id} className="pb-docs-index-section" aria-labelledby={`docs-section-${section.id}`}>
+        <h3 id={`docs-section-${section.id}`}>{section.title}</h3>
+        <ul>
+          {section.pages.map(page => <li key={page.id}>
+              <a href={page.meta.frontMatter.path}>{page.meta.headline}</a>
+              <span>{page.meta.frontMatter.description}</span>
+            </li>)}
+        </ul>
+      </section>)}
+  </div>;
+
+/** Previous and next links plus the pages in the current section. */
+const DocsPageNav = ({
+  page
+}: {
+  page: DocsPage;
+}) => {
+  const { previous, next } = docsNeighbours(page.id);
+  const section = docsSectionOf(page.id);
+  return <>
+      <nav className="pb-docs-pager" aria-label="Previous and next pages">
+        {previous ? <a className="is-previous" href={previous.meta.frontMatter.path} rel="prev">
+            <small>Previous</small>
+            <span>{previous.meta.headline}</span>
+          </a> : <span />}
+        {next ? <a className="is-next" href={next.meta.frontMatter.path} rel="next">
+            <small>Next</small>
+            <span>{next.meta.headline}</span>
+          </a> : null}
+      </nav>
+      {section ? <nav className="pb-docs-section-nav" aria-label={`${section.title} pages`}>
+          <p>
+            <a href={docsIndexPage.meta.frontMatter.path}>Docs</a> / {section.title}
+          </p>
+          <ul>
+            {section.pages.map(other => <li key={other.id}>
+                {other.id === page.id ? <span aria-current="page">{other.meta.headline}</span> : <a href={other.meta.frontMatter.path}>{other.meta.headline}</a>}
+              </li>)}
+          </ul>
+        </nav> : null}
+    </>;
+};
+
+function articleDocument(article: SiteArticle): ContentDocument {
+  return article.document ?? docsDocument(article.sourceFile);
 }
 
 interface Section {
@@ -108,6 +210,7 @@ function linkedPaths(blocks: readonly ContentBlock[]): Set<string> {
   for (const block of blocks) {
     if (block.type === "paragraph" || block.type === "heading") visit(block.children);
     if (block.type === "list") block.items.forEach(visit);
+    if (block.type === "table") [block.header, ...block.rows].forEach(row => row.forEach(visit));
     if (block.type === "figure" && block.caption) visit(block.caption);
   }
   return paths;
@@ -120,18 +223,22 @@ export const ContentPage = ({
 }) => {
   const article = route.article;
   if (!article) return null;
-  const { document } = article;
+  const document = articleDocument(article);
   const headline = articleHeadline(article);
   const { intro, sections } = splitSections(document);
   const linked = linkedPaths(document.blocks);
-  // Link the other content pages this page does not already link in its copy.
-  const related = siteRoutes.filter(other => other.article && other.id !== route.id && !linked.has(other.path));
+  // Marketing pages link the other marketing pages they do not already link in
+  // their copy. Docs pages use the docs navigation instead.
+  const related = article.docsPage ? [] : siteRoutes.filter(other => other.article && !other.article.docsPage && other.id !== route.id && !linked.has(other.path));
   const [lede, ...introRest] = intro;
-  return <article className="pb-article glass" aria-labelledby="page-title">
+  const crumbs = article.breadcrumbs;
+  return <article className={`pb-article glass ${article.docsPage ? "is-docs" : ""}`} aria-labelledby="page-title">
       <nav className="pb-article-breadcrumb" aria-label="Breadcrumb">
         <ol>
           <li><a href="/">Home</a></li>
-          <li aria-current="page">{article.breadcrumbName}</li>
+          {crumbs.map((crumb, index) => index === crumbs.length - 1
+            ? <li key={crumb.path} aria-current="page">{crumb.name}</li>
+            : <li key={crumb.path}><a href={crumb.path}>{crumb.name}</a></li>)}
         </ol>
       </nav>
       <header className="pb-article-header">
@@ -149,6 +256,7 @@ export const ContentPage = ({
         <p className="pb-article-applies">
           Applies to Planban v{planbanVersion}. Updated <time dateTime={document.frontMatter.updated}>{formatDate(document.frontMatter.updated)}</time>.
         </p>
+        {article.docsPage ? <DocsPageNav page={article.docsPage} /> : null}
         {related.length > 0 ? <nav className="pb-article-related" aria-label="Related pages">
             <ul>
               {related.map(other => <li key={other.id}><a href={other.path}>{other.article ? articleHeadline(other.article) : other.title}</a></li>)}
