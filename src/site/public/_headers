@@ -1,0 +1,16 @@
+# Cloudflare Pages response headers. HTML pages keep the Pages default
+# (public, max-age=0, must-revalidate) so every deploy is visible immediately.
+
+# Content-hashed Vite bundles: the file name changes whenever the content does.
+/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Stable-named public media, fonts, and images: cache, then revalidate.
+/assets/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600
