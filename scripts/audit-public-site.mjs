@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readdir, readFile, stat } from "node:fs/promises";
-import { join, relative, resolve, sep } from "node:path";
+import { basename, join, relative, resolve, sep } from "node:path";
 
 const repoRoot = resolve(new URL("..", import.meta.url).pathname);
 const auditRoots = process.argv.slice(2).map((path) => resolve(path));
@@ -14,12 +14,17 @@ const roots = auditRoots.length > 0
 
 const requiredFiles = [
   "src/site/index.html",
-  "src/site/privacy/index.html",
-  "src/site/main.tsx",
+  "src/site/entry-client.tsx",
+  "src/site/entry-server.tsx",
+  "src/site/routes.ts",
   "src/site/components/PlanbanPublicWebsite.tsx",
   "functions/api/subscribe.ts",
   "dist/site/index.html",
   "dist/site/privacy/index.html",
+  "dist/site/404.html",
+  "dist/site/robots.txt",
+  "dist/site/sitemap.xml",
+  "dist/site/_headers",
 ];
 
 const forbiddenSegments = new Set([
@@ -66,9 +71,12 @@ const textExtensions = new Set([
   ".ts",
   ".tsx",
   ".txt",
+  ".xml",
   ".yml",
   ".yaml",
 ]);
+
+const textFileNames = new Set(["_headers", "_redirects"]);
 
 function extension(path) {
   const index = path.lastIndexOf(".");
@@ -127,7 +135,7 @@ for (const root of roots) {
       findings.push(entry);
       continue;
     }
-    if (!textExtensions.has(extension(entry.path))) continue;
+    if (!textExtensions.has(extension(entry.path)) && !textFileNames.has(basename(entry.path))) continue;
     const text = await readFile(entry.absolutePath, "utf8");
     for (const rule of forbiddenContent) {
       if (rule.pattern.test(text)) {

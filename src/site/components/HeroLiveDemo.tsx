@@ -119,9 +119,11 @@ export const DemoItemDetail = () => <div className="pb-live-detail">
   </div>;
 
 export const HeroLiveDemo = ({ theme, hostLogos, planbanMark }: HeroLiveDemoProps) => {
-  const [reducedMotion, setReducedMotion] = useState(() => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
+  // Start animated to match the server render; the effect below switches to the
+  // settled frame for reduced-motion visitors after hydration.
+  const [reducedMotion, setReducedMotion] = useState(false);
   const [sceneIndex, setSceneIndex] = useState(0);
-  const [step, setStep] = useState(reducedMotion ? 5 : 0);
+  const [step, setStep] = useState(0);
   const [typed, setTyped] = useState(0);
   const [workIndex, setWorkIndex] = useState(0);
   const scene = scenes[sceneIndex] ?? scenes[0]!;

@@ -20,6 +20,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          # Full commit history (without historical file contents) so the
+          # sitemap lastmod reflects when each page last changed.
+          fetch-depth: 0
+          filter: blob:none
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -43,6 +48,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          # Full commit history (without historical file contents) so the
+          # sitemap lastmod reflects when each page last changed.
+          fetch-depth: 0
+          filter: blob:none
 
       - name: Set up Node
         uses: actions/setup-node@v4

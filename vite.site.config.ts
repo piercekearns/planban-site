@@ -15,7 +15,8 @@ function resolveSiteCommit() {
   }
 }
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
+  appType: "mpa",
   plugins: [
     react(),
     {
@@ -38,14 +39,26 @@ export default defineConfig({
     port: 4320,
     strictPort: false,
   },
-  build: {
-    outDir: "../../dist/site",
-    emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        main: resolve("src/site/index.html"),
-        privacy: resolve("src/site/privacy/index.html"),
+  build: isSsrBuild
+    ? {
+      // Server bundle used only by scripts/prerender-site.mjs; never deployed.
+      outDir: "../../dist/site-server",
+      emptyOutDir: true,
+      copyPublicDir: false,
+      rollupOptions: {
+        input: resolve("src/site/entry-server.tsx"),
+      },
+    }
+    : {
+      outDir: "../../dist/site",
+      emptyOutDir: true,
+      // Content-hashed bundles live apart from the stable-named files in
+      // public/assets so only they receive immutable caching (see _headers).
+      assetsDir: "static",
+      rollupOptions: {
+        input: {
+          main: resolve("src/site/index.html"),
+        },
       },
     },
-  },
-});
+}));
