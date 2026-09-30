@@ -103,6 +103,7 @@ export const siteRoutes: readonly SiteRoute[] = [
       ...sharedPageSources,
       "src/site/components/HeroLiveDemo.tsx",
       "src/site/components/OutcomeJourney.tsx",
+      "src/site/content/home-faq.md",
     ],
     preloadDisplayFont: true,
     structuredData: true,

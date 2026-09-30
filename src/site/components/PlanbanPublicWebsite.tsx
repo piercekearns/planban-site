@@ -4,7 +4,8 @@ import { DemoBoard, DemoItemDetail, HeroLiveDemo } from "./HeroLiveDemo";
 import { OutcomeJourney } from "./OutcomeJourney";
 import { CheckIcon, CopyIcon, copyTextToClipboard } from "./copy";
 import { type SiteRouteId, findSiteRoute } from "../routes";
-import { ContentPage } from "./ContentPage";
+import homeFaq from "../content/home-faq.md";
+import { ContentPage, QuestionList } from "./ContentPage";
 import { planbanReleaseUrl, planbanReleasesUrl, planbanVersion } from "../site-facts";
 const planbanLogoImages = {
   light: "/assets/card-stack-black.svg",
@@ -218,12 +219,16 @@ const hostPlatforms = [{
   status: "Available",
   tone: "ok",
   copy: "Board in the in-app browser. /pb, /planban, /planban-create.",
+  href: "/codex/",
+  linkLabel: "Codex guide",
   icon: <AgentLogo src={agentLogoImages.codex} label="codex" loading="lazy" />
 }, {
   title: "Claude Code desktop",
   status: "Available",
   tone: "ok",
   copy: "Board in the browser pane. /planban:pb and friends.",
+  href: "/claude-code/",
+  linkLabel: "Claude Code guide",
   icon: <AgentLogo src={agentLogoImages.claude} label="claude" loading="lazy" />
 }, {
   title: "Any MCP host",
@@ -432,6 +437,7 @@ const SubpageShell = ({
           <a href="/#install">Install</a>
           <a href="/#features">Features</a>
           <a href="/#future">Hosts</a>
+          <a href="/#faq">FAQ</a>
         </nav>
         <div className="pb-header-actions">
           <a className="pb-icon-button" href="https://github.com/piercekearns/planban" aria-label="Open Planban on GitHub">
@@ -452,6 +458,7 @@ const SubpageShell = ({
         <a href="/claude-code/">Planban for Claude Code</a>
         <a href="/codex/">Planban for Codex</a>
         <a href="/what-is-an-agent-native-kanban-board/">What is agent-native Kanban?</a>
+        <a href="/#faq">FAQ</a>
         <a href={planbanReleasesUrl}>Changelog · v{planbanVersion}</a>
         <a href="/privacy/">Privacy</a>
         <a href="https://github.com/piercekearns/planban/blob/main/LICENSE">MIT licence</a>
@@ -979,6 +986,7 @@ export const PlanbanPublicWebsite = ({
             <a href="#features">Features</a>
             <a href="#loop">How it works</a>
             <a href="#future">Hosts</a>
+            <a href="#faq">FAQ</a>
           </nav>
           <div className="pb-header-actions">
             <div className="pb-theme-toggle" role="group" aria-label="Theme">
@@ -1006,6 +1014,7 @@ export const PlanbanPublicWebsite = ({
             <a href="#install" onClick={() => setMobileMenuOpen(false)}>Install</a>
             <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
             <a href="#future" onClick={() => setMobileMenuOpen(false)}>Hosts</a>
+            <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
             <span className="pb-menu-divider" aria-hidden="true" />
             <a href="#updates" onClick={() => setMobileMenuOpen(false)}>Keep up to date</a>
             <span className="pb-menu-divider" aria-hidden="true" />
@@ -1204,13 +1213,24 @@ export const PlanbanPublicWebsite = ({
               <p>Planban runs in Codex and Claude Code today, and any MCP host can use the same tools and open the board as a link. Online Mode, remote access to your own board, is in design.</p>
             </div>
             <div className="pb-platforms">
-              {hostPlatforms.map(platform => <article className={`pb-platform-card tone-${platform.tone}`} key={platform.title}>
-                  <span className="pb-platform-icon">{platform.icon}</span>
-                  <strong>{platform.title}</strong>
-                  <small>{platform.status}</small>
-                  <p>{platform.copy}</p>
-                </article>)}
+              {hostPlatforms.map(platform => {
+                const card = <>
+                    <span className="pb-platform-icon">{platform.icon}</span>
+                    <strong>{platform.title}</strong>
+                    <small>{platform.status}</small>
+                    <p>{platform.copy}</p>
+                    {"href" in platform ? <span className="pb-platform-link">{platform.linkLabel}</span> : null}
+                  </>;
+                return "href" in platform ? <a className={`pb-platform-card is-link tone-${platform.tone}`} key={platform.title} href={platform.href}>{card}</a> : <article className={`pb-platform-card tone-${platform.tone}`} key={platform.title}>{card}</article>;
+              })}
             </div>
+          </section>
+
+          <section id="faq" className="pb-faq" aria-labelledby="faq-title">
+            <div className="pb-future-heading">
+              <h2 id="faq-title">Questions.</h2>
+            </div>
+            <QuestionList document={homeFaq} />
           </section>
 
           <footer id="updates" className="pb-footer pb-footer-on-accent">
@@ -1223,6 +1243,10 @@ export const PlanbanPublicWebsite = ({
           <a href="#install">Install</a>
           <a href="#features">Features</a>
           <a href="#future">Hosts</a>
+          <a href="#faq">FAQ</a>
+          <a href="/claude-code/">Planban for Claude Code</a>
+          <a href="/codex/">Planban for Codex</a>
+          <a href="/what-is-an-agent-native-kanban-board/">What is agent-native Kanban?</a>
           <a href={planbanReleasesUrl}>Changelog · v{planbanVersion}</a>
           <a href="https://github.com/piercekearns/planban/blob/main/PRODUCT.md">Product constitution</a>
           <a href="/privacy/">Privacy</a>
