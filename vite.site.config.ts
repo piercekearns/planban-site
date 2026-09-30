@@ -35,12 +35,13 @@ export default defineConfig(({ isSsrBuild }) => ({
       },
     },
     {
-      // Page copy lives in src/site/content/*.md. Each import becomes a small
-      // JSON block tree at build time, rendered by ContentPage.
+      // Page copy lives in src/site/content/**/*.md (docs pages under
+      // content/docs/). Each import becomes a small JSON block tree at build
+      // time, rendered by ContentPage.
       name: "planban-site-content-markdown",
       enforce: "pre",
       transform(source, id) {
-        if (!/\/src\/site\/content\/[^/]+\.md$/u.test(id)) return null;
+        if (!/\/src\/site\/content\/(?:[a-z0-9-]+\/)*[^/]+\.md$/u.test(id)) return null;
         const document = parseContentDocument(source, id, { tokens: { planbanVersion } });
         return { code: `export default ${JSON.stringify(document)};`, map: null };
       },

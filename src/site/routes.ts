@@ -16,13 +16,20 @@ import claudeCodePage from "./content/claude-code.md";
 import codexPage from "./content/codex.md";
 import agentNativeKanbanPage from "./content/what-is-an-agent-native-kanban-board.md";
 
+/** Docs route ids are "docs" for /docs/ and "docs-<slug>" for pages under it. */
+export type DocsRouteId = "docs" | `docs-${string}`;
+
 export type SiteRouteId =
   | "home"
   | "privacy"
   | "not-found"
   | "claude-code"
   | "codex"
-  | "what-is-an-agent-native-kanban-board";
+  | "what-is-an-agent-native-kanban-board"
+  | DocsRouteId;
+
+/** Folder-style content paths: /slug/, /docs/, /docs/slug/, /docs/changelog/slug/. */
+const contentPathPattern = /^\/(?:[a-z0-9-]+\/|docs\/(?:[a-z0-9-]+\/)?|docs\/changelog\/[a-z0-9-]+\/)$/u;
 
 export interface SiteArticle {
   document: ContentDocument;
@@ -72,7 +79,7 @@ function articleRoute(
   options: { breadcrumbName: string; image: string; socialTitle: string },
 ): SiteRoute {
   const { path, title, description } = document.frontMatter;
-  if (!/^\/[a-z0-9-]+\/$/u.test(path)) throw new Error(`${sourceFile}: path must be folder-style, like /codex/.`);
+  if (!contentPathPattern.test(path)) throw new Error(`${sourceFile}: path must be folder-style, like /codex/ or /docs/cli/.`);
   return {
     id,
     path,
