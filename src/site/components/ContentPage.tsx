@@ -3,6 +3,7 @@ import { type ContentBlock, type ContentDocument, type InlineNode, inlineText } 
 import { type SiteArticle, type SiteRoute, articleHeadline, siteRoutes } from "../routes";
 import { type DocsPage, docsIndexPage, docsNeighbours, docsSectionOf, docsSections } from "../docs";
 import { docsDocument } from "../docs-content";
+import { planbanReleases, releaseUrl } from "../releases";
 import { planbanVersion } from "../site-facts";
 import { CheckIcon, CopyIcon, copyTextToClipboard } from "./copy";
 import "../content-page.css";
@@ -101,10 +102,32 @@ const ContentComponent = ({
   switch (name) {
     case "docs-index":
       return <DocsIndexList />;
+    case "release-history":
+      return <ReleaseHistory />;
     default:
       throw new Error(`Unknown content component: ${name}`);
   }
 };
+
+/** The changelog table, generated from src/site/releases.ts. */
+const ReleaseHistory = () => <div className="pb-article-table" role="region" aria-label="Planban releases" tabIndex={0}>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Version</th>
+          <th scope="col">Released</th>
+          <th scope="col">Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        {planbanReleases.map(release => <tr key={release.version}>
+            <td><a href={releaseUrl(release)}>v{release.version}</a></td>
+            <td><time dateTime={release.published}>{formatDate(release.published)}</time></td>
+            <td>{release.summary}</td>
+          </tr>)}
+      </tbody>
+    </table>
+  </div>;
 
 /** The docs index link list, generated from the docs registry. */
 const DocsIndexList = () => <div className="pb-docs-index">

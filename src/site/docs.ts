@@ -20,6 +20,8 @@ import dataStorageMeta from "./content/docs/data-storage.md?meta";
 import gitWorktreesMeta from "./content/docs/git-worktrees.md?meta";
 import updatingMeta from "./content/docs/updating.md?meta";
 import troubleshootingMeta from "./content/docs/troubleshooting.md?meta";
+import changelogMeta from "./content/docs/changelog/index.md?meta";
+import release116Meta from "./content/docs/changelog/v1-1-6.md?meta";
 
 export type DocsSectionId = "get-started" | "use-planban" | "reference" | "maintain" | "changelog";
 
@@ -88,7 +90,14 @@ export const docsSections: readonly DocsSection[] = [
       { id: "docs-troubleshooting", meta: troubleshootingMeta, sourceFile: "src/site/content/docs/troubleshooting.md", breadcrumbName: "Troubleshooting" },
     ],
   },
-  { id: "changelog", title: "Changelog", pages: [] },
+  {
+    id: "changelog",
+    title: "Changelog",
+    pages: [
+      { id: "docs-changelog", meta: changelogMeta, sourceFile: "src/site/content/docs/changelog/index.md", breadcrumbName: "Changelog" },
+      { id: "docs-changelog-v1-1-6", meta: release116Meta, sourceFile: "src/site/content/docs/changelog/v1-1-6.md", breadcrumbName: "v1.1.6", parentId: "docs-changelog" },
+    ],
+  },
 ];
 
 /** Every docs page in reading order, starting with the index. */

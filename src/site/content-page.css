@@ -299,6 +299,10 @@
     min-width: 12ch;
   }
 
+  .pb-article-table td:has(> time) {
+    white-space: nowrap;
+  }
+
   .pb-article-table td:first-child {
     color: var(--pb-ink);
   }
