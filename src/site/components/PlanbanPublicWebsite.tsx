@@ -2,7 +2,10 @@ import { type CSSProperties, type FormEvent, type PointerEvent, type ReactNode, 
 import { ArrowUp, Menu } from "lucide-react";
 import { DemoBoard, DemoItemDetail, HeroLiveDemo } from "./HeroLiveDemo";
 import { OutcomeJourney } from "./OutcomeJourney";
-import type { SiteRouteId } from "../routes";
+import { CheckIcon, CopyIcon, copyTextToClipboard } from "./copy";
+import { type SiteRouteId, findSiteRoute } from "../routes";
+import homeFaq from "../content/home-faq.md";
+import { ContentPage, QuestionList } from "./ContentPage";
 import { planbanReleaseUrl, planbanReleasesUrl, planbanVersion } from "../site-facts";
 const planbanLogoImages = {
   light: "/assets/card-stack-black.svg",
@@ -216,12 +219,16 @@ const hostPlatforms = [{
   status: "Available",
   tone: "ok",
   copy: "Board in the in-app browser. /pb, /planban, /planban-create.",
+  href: "/codex/",
+  linkLabel: "Codex guide",
   icon: <AgentLogo src={agentLogoImages.codex} label="codex" loading="lazy" />
 }, {
   title: "Claude Code desktop",
   status: "Available",
   tone: "ok",
   copy: "Board in the browser pane. /planban:pb and friends.",
+  href: "/claude-code/",
+  linkLabel: "Claude Code guide",
   icon: <AgentLogo src={agentLogoImages.claude} label="claude" loading="lazy" />
 }, {
   title: "Any MCP host",
@@ -252,13 +259,6 @@ const PlanbanBrandLockup = ({
   theme: "light" | "dark";
   loading?: "eager" | "lazy";
 }) => <img className="pb-brand-lockup" src={planbanBrandImages[theme]} alt="" loading={loading} decoding="async" />;
-const CopyIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-  </svg>;
-const CheckIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m5 12 4.5 4.5L19 7" />
-  </svg>;
 const SystemIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M4.75 5A2.75 2.75 0 0 0 2 7.75v7.5A2.75 2.75 0 0 0 4.75 18h5.75v1.5H8a.75.75 0 0 0 0 1.5h8a.75.75 0 0 0 0-1.5h-2.5V18h5.75A2.75 2.75 0 0 0 22 15.25v-7.5A2.75 2.75 0 0 0 19.25 5H4.75Zm0 1.5h14.5c.69 0 1.25.56 1.25 1.25v7.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-7.5c0-.69.56-1.25 1.25-1.25Z" fill="currentColor" />
   </svg>;
@@ -437,6 +437,7 @@ const SubpageShell = ({
           <a href="/#install">Install</a>
           <a href="/#features">Features</a>
           <a href="/#future">Hosts</a>
+          <a href="/#faq">FAQ</a>
         </nav>
         <div className="pb-header-actions">
           <a className="pb-icon-button" href="https://github.com/piercekearns/planban" aria-label="Open Planban on GitHub">
@@ -450,6 +451,19 @@ const SubpageShell = ({
     <main className="pb-privacy-page">
       {children}
     </main>
+
+    <footer className="pb-subpage-footer">
+      <nav className="pb-subpage-footer-links" aria-label="Footer">
+        <a href="/">Home</a>
+        <a href="/claude-code/">Planban for Claude Code</a>
+        <a href="/codex/">Planban for Codex</a>
+        <a href="/what-is-an-agent-native-kanban-board/">What is agent-native Kanban?</a>
+        <a href="/#faq">FAQ</a>
+        <a href={planbanReleasesUrl}>Changelog · v{planbanVersion}</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="https://github.com/piercekearns/planban/blob/main/LICENSE">MIT licence</a>
+      </nav>
+    </footer>
   </div>;
 
 const PrivacyPolicyPage = ({
@@ -936,25 +950,6 @@ export const PlanbanPublicWebsite = ({
   function leavePointer() {
     asciiPointer.current.active = false;
   }
-  async function copyTextToClipboard(text: string) {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const copyTarget = document.createElement("textarea");
-        copyTarget.value = text;
-        copyTarget.setAttribute("readonly", "");
-        copyTarget.style.position = "fixed";
-        copyTarget.style.opacity = "0";
-        document.body.appendChild(copyTarget);
-        copyTarget.select();
-        document.execCommand("copy");
-        document.body.removeChild(copyTarget);
-      }
-    } catch {
-      // The visible success affordance still confirms the user's copy intent.
-    }
-  }
   async function copyInstallCommand() {
     await copyTextToClipboard(activeInstallPrompt);
     setCopyState("copied");
@@ -965,6 +960,12 @@ export const PlanbanPublicWebsite = ({
   }
   if (route === "not-found") {
     return <NotFoundPage theme={resolvedTheme} />;
+  }
+  const contentRoute = findSiteRoute(route);
+  if (contentRoute?.article) {
+    return <SubpageShell theme={resolvedTheme}>
+        <ContentPage route={contentRoute} />
+      </SubpageShell>;
   }
   return <div className={`pb-site ${resolvedTheme}`} style={{
     "--spot-x": `${pointer.x}%`,
@@ -985,6 +986,7 @@ export const PlanbanPublicWebsite = ({
             <a href="#features">Features</a>
             <a href="#loop">How it works</a>
             <a href="#future">Hosts</a>
+            <a href="#faq">FAQ</a>
           </nav>
           <div className="pb-header-actions">
             <div className="pb-theme-toggle" role="group" aria-label="Theme">
@@ -1012,6 +1014,7 @@ export const PlanbanPublicWebsite = ({
             <a href="#install" onClick={() => setMobileMenuOpen(false)}>Install</a>
             <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
             <a href="#future" onClick={() => setMobileMenuOpen(false)}>Hosts</a>
+            <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
             <span className="pb-menu-divider" aria-hidden="true" />
             <a href="#updates" onClick={() => setMobileMenuOpen(false)}>Keep up to date</a>
             <span className="pb-menu-divider" aria-hidden="true" />
@@ -1210,13 +1213,24 @@ export const PlanbanPublicWebsite = ({
               <p>Planban runs in Codex and Claude Code today, and any MCP host can use the same tools and open the board as a link. Online Mode, remote access to your own board, is in design.</p>
             </div>
             <div className="pb-platforms">
-              {hostPlatforms.map(platform => <article className={`pb-platform-card tone-${platform.tone}`} key={platform.title}>
-                  <span className="pb-platform-icon">{platform.icon}</span>
-                  <strong>{platform.title}</strong>
-                  <small>{platform.status}</small>
-                  <p>{platform.copy}</p>
-                </article>)}
+              {hostPlatforms.map(platform => {
+                const card = <>
+                    <span className="pb-platform-icon">{platform.icon}</span>
+                    <strong>{platform.title}</strong>
+                    <small>{platform.status}</small>
+                    <p>{platform.copy}</p>
+                    {"href" in platform ? <span className="pb-platform-link">{platform.linkLabel}</span> : null}
+                  </>;
+                return "href" in platform ? <a className={`pb-platform-card is-link tone-${platform.tone}`} key={platform.title} href={platform.href}>{card}</a> : <article className={`pb-platform-card tone-${platform.tone}`} key={platform.title}>{card}</article>;
+              })}
             </div>
+          </section>
+
+          <section id="faq" className="pb-faq" aria-labelledby="faq-title">
+            <div className="pb-future-heading">
+              <h2 id="faq-title">Questions.</h2>
+            </div>
+            <QuestionList document={homeFaq} />
           </section>
 
           <footer id="updates" className="pb-footer pb-footer-on-accent">
@@ -1229,6 +1243,10 @@ export const PlanbanPublicWebsite = ({
           <a href="#install">Install</a>
           <a href="#features">Features</a>
           <a href="#future">Hosts</a>
+          <a href="#faq">FAQ</a>
+          <a href="/claude-code/">Planban for Claude Code</a>
+          <a href="/codex/">Planban for Codex</a>
+          <a href="/what-is-an-agent-native-kanban-board/">What is agent-native Kanban?</a>
           <a href={planbanReleasesUrl}>Changelog · v{planbanVersion}</a>
           <a href="https://github.com/piercekearns/planban/blob/main/PRODUCT.md">Product constitution</a>
           <a href="/privacy/">Privacy</a>

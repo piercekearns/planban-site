@@ -1,0 +1,374 @@
+/* Content pages (/claude-code/, /codex/, /what-is-an-agent-native-kanban-board/),
+   the subpage footer, and the home page FAQ. Uses the site tokens from
+   styles.css so light, dark, and the accent band all apply. */
+
+@layer components {
+  /* Article */
+  .pb-article {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: clamp(26px, 5vw, 56px);
+    border-radius: var(--pb-radius-accent-panel);
+    color: var(--pb-ink);
+  }
+
+  .pb-article-breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    font-weight: 720;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--pb-faint);
+  }
+
+  .pb-article-breadcrumb li + li::before {
+    content: "/";
+    margin-right: 8px;
+    color: var(--pb-faint);
+  }
+
+  .pb-article-breadcrumb a {
+    color: color-mix(in oklab, var(--pb-codex-bright) 62%, var(--pb-faint));
+    text-decoration: none;
+  }
+
+  .pb-article-breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .pb-article-header h1 {
+    margin: 18px 0 0;
+    font-size: clamp(36px, 5.4vw, 60px);
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  .pb-article-header > p {
+    margin: 18px 0 0;
+    color: var(--pb-muted);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .pb-article-header > .pb-article-lede {
+    margin-top: 22px;
+    color: var(--pb-ink);
+    font-size: 19px;
+    line-height: 1.55;
+  }
+
+  .pb-article-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 34px;
+    margin-top: 42px;
+  }
+
+  .pb-article-body section {
+    min-width: 0;
+    border-top: 1px solid var(--pb-divider-line);
+    padding-top: 28px;
+  }
+
+  .pb-article-body h2 {
+    margin: 0 0 14px;
+    font-size: clamp(22px, 2.6vw, 28px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .pb-article-body p,
+  .pb-article-body li {
+    color: var(--pb-muted);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .pb-article-body p {
+    margin: 0 0 14px;
+  }
+
+  .pb-article-body ul,
+  .pb-article-body ol {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 14px;
+    padding-left: 22px;
+  }
+
+  .pb-article-body li::marker {
+    color: var(--pb-faint);
+  }
+
+  .pb-article-body > section > :last-child {
+    margin-bottom: 0;
+  }
+
+  .pb-article strong {
+    color: var(--pb-ink);
+    font-weight: 650;
+  }
+
+  .pb-article a {
+    color: var(--pb-codex);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--pb-codex) 36%, transparent);
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  .pb-site.dark .pb-article a {
+    color: var(--pb-codex-bright);
+  }
+
+  .pb-article a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .pb-article :not(pre) > code,
+  .pb-faq :not(pre) > code {
+    padding: 1px 5px;
+    border: 1px solid var(--pb-line);
+    border-radius: 6px;
+    background: color-mix(in oklab, var(--pb-glass) 80%, transparent);
+    color: var(--pb-ink);
+    font: 0.88em/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    overflow-wrap: anywhere;
+  }
+
+  /* Code blocks reuse the install prompt's .pb-code-box and .pb-copy-icon. */
+  .pb-article-code {
+    margin: 4px 0 18px;
+  }
+
+  .pb-article-code pre {
+    margin: 0;
+    overflow-x: auto;
+    border: 1px solid color-mix(in oklab, var(--pb-codex) 14%, var(--pb-line));
+    border-radius: var(--pb-radius-accent-card);
+    background: color-mix(in oklab, var(--pb-glass) 88%, transparent);
+    color: var(--pb-ink);
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--pb-codex) 8%, transparent);
+    padding: 16px 18px;
+    font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    scrollbar-color: var(--pb-scrollbar-thumb) var(--pb-scrollbar-track);
+    scrollbar-width: thin;
+  }
+
+  .pb-article-code.is-text pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .pb-article-code.is-bash pre {
+    white-space: pre;
+    padding-right: 64px;
+  }
+
+  .pb-article-code.is-bash pre::before {
+    content: none;
+  }
+
+  .pb-article-code .pb-copy-icon {
+    top: 10px;
+    right: 10px;
+    transform: none;
+    background: var(--pb-glass-strong);
+    backdrop-filter: blur(8px);
+  }
+
+  .pb-article-code .pb-copy-icon:hover {
+    transform: translateY(-1px);
+  }
+
+  .pb-article-code pre code {
+    font: inherit;
+  }
+
+  .pb-article-figure {
+    margin: 30px 0 0;
+  }
+
+  .pb-article-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--pb-line);
+    border-radius: var(--pb-radius-accent-card);
+    background: #ffffff;
+    box-shadow: 0 18px 40px rgba(12, 18, 30, 0.08);
+  }
+
+  .pb-article-figure figcaption {
+    margin-top: 12px;
+    color: var(--pb-faint);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .pb-article-body .pb-article-figure {
+    margin: 22px 0 18px;
+  }
+
+  .pb-article-footer {
+    display: grid;
+    gap: 18px;
+    margin-top: 40px;
+    border-top: 1px solid var(--pb-divider-line);
+    padding-top: 24px;
+  }
+
+  .pb-article-applies {
+    margin: 0;
+    color: var(--pb-faint);
+    font-size: 14px;
+  }
+
+  .pb-article-related ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-article .pb-article-related a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--pb-line);
+    border-radius: 10px;
+    background: color-mix(in oklab, var(--pb-glass) 80%, transparent);
+    color: var(--pb-ink);
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .pb-article .pb-article-related a:hover {
+    border-color: color-mix(in oklab, var(--pb-codex) 42%, var(--pb-line));
+    background: var(--pb-codex-soft);
+  }
+
+  /* Footer on subpages */
+  .pb-subpage-footer {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 56px;
+  }
+
+  .pb-subpage-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 22px;
+    border-top: 1px solid var(--pb-divider-line);
+    padding-top: 28px;
+  }
+
+  .pb-subpage-footer-links a {
+    color: var(--pb-muted);
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  .pb-subpage-footer-links a:hover {
+    color: var(--pb-ink);
+  }
+
+  /* Where it runs: the Codex and Claude Code cards link to their pages. */
+  a.pb-platform-card.is-link {
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+  }
+
+  a.pb-platform-card.is-link:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(8, 23, 62, 0.46);
+    transform: translateY(-1px);
+  }
+
+  .pb-platform-link {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.45);
+    text-underline-offset: 3px;
+  }
+
+  /* Home page FAQ, on the accent band between Where it runs and the footer. */
+  .pb-faq {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 104px;
+  }
+
+  .pb-faq .pb-future-heading h2 {
+    margin: 0;
+  }
+
+  .pb-faq-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 34px 48px;
+    margin-top: 48px;
+    text-align: left;
+  }
+
+  .pb-faq-item {
+    border-top: 1px solid var(--pb-divider-line);
+    padding-top: 22px;
+  }
+
+  .pb-faq-item h3 {
+    margin: 0 0 10px;
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.3;
+  }
+
+  .pb-faq-item p {
+    margin: 0;
+    color: var(--pb-muted);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .pb-faq-item a {
+    color: #ffffff;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+    text-underline-offset: 3px;
+  }
+
+  .pb-faq-item a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  @media (max-width: 760px) {
+    .pb-faq-list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 26px;
+    }
+
+    .pb-faq {
+      padding-bottom: 72px;
+    }
+
+    .pb-article-header > .pb-article-lede {
+      font-size: 17px;
+    }
+  }
+}

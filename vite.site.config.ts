@@ -2,6 +2,8 @@ import react from "@vitejs/plugin-react";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
+import { parseContentDocument } from "./src/site/content/markdown.ts";
+import { planbanVersion } from "./src/site/site-facts.ts";
 
 function resolveSiteCommit() {
   if (process.env.PLANBAN_SITE_COMMIT) return process.env.PLANBAN_SITE_COMMIT;
@@ -30,6 +32,17 @@ export default defineConfig(({ isSsrBuild }) => ({
           },
           injectTo: "head",
         }];
+      },
+    },
+    {
+      // Page copy lives in src/site/content/*.md. Each import becomes a small
+      // JSON block tree at build time, rendered by ContentPage.
+      name: "planban-site-content-markdown",
+      enforce: "pre",
+      transform(source, id) {
+        if (!/\/src\/site\/content\/[^/]+\.md$/u.test(id)) return null;
+        const document = parseContentDocument(source, id, { tokens: { planbanVersion } });
+        return { code: `export default ${JSON.stringify(document)};`, map: null };
       },
     },
   ],
