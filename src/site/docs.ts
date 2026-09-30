@@ -9,6 +9,11 @@ import installCodexMeta from "./content/docs/install-codex.md?meta";
 import installClaudeCodeMeta from "./content/docs/install-claude-code.md?meta";
 import otherMcpHostsMeta from "./content/docs/other-mcp-hosts.md?meta";
 import setUpAProjectMeta from "./content/docs/set-up-a-project.md?meta";
+import slashCommandsMeta from "./content/docs/slash-commands.md?meta";
+import itemsAndGroupsMeta from "./content/docs/items-and-groups.md?meta";
+import statusAndPriorityMeta from "./content/docs/status-and-priority.md?meta";
+import specsPlansNextActionsMeta from "./content/docs/specs-plans-next-actions.md?meta";
+import agentProtocolMeta from "./content/docs/agent-protocol.md?meta";
 
 export type DocsSectionId = "get-started" | "use-planban" | "reference" | "maintain" | "changelog";
 
@@ -48,7 +53,17 @@ export const docsSections: readonly DocsSection[] = [
       { id: "docs-set-up-a-project", meta: setUpAProjectMeta, sourceFile: "src/site/content/docs/set-up-a-project.md", breadcrumbName: "Set up a project" },
     ],
   },
-  { id: "use-planban", title: "Use Planban", pages: [] },
+  {
+    id: "use-planban",
+    title: "Use Planban",
+    pages: [
+      { id: "docs-slash-commands", meta: slashCommandsMeta, sourceFile: "src/site/content/docs/slash-commands.md", breadcrumbName: "Commands" },
+      { id: "docs-items-and-groups", meta: itemsAndGroupsMeta, sourceFile: "src/site/content/docs/items-and-groups.md", breadcrumbName: "Items and Groups" },
+      { id: "docs-status-and-priority", meta: statusAndPriorityMeta, sourceFile: "src/site/content/docs/status-and-priority.md", breadcrumbName: "Status and priority" },
+      { id: "docs-specs-plans-next-actions", meta: specsPlansNextActionsMeta, sourceFile: "src/site/content/docs/specs-plans-next-actions.md", breadcrumbName: "Specs, Plans and next actions" },
+      { id: "docs-agent-protocol", meta: agentProtocolMeta, sourceFile: "src/site/content/docs/agent-protocol.md", breadcrumbName: "Agent protocol" },
+    ],
+  },
   { id: "reference", title: "Reference", pages: [] },
   { id: "maintain", title: "Maintain", pages: [] },
   { id: "changelog", title: "Changelog", pages: [] },
