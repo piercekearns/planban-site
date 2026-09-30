@@ -706,35 +706,6 @@ body {
       inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   }
 
-  .pb-hero-demo-video,
-  .pb-hero-demo-poster {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .pb-hero-demo-video {
-    cursor: pointer;
-  }
-
-  .pb-hero-demo-video[controls] {
-    cursor: auto;
-  }
-
-  .pb-hero-demo-video:focus-visible {
-    outline: 2px solid color-mix(in oklab, var(--pb-codex-bright) 76%, white);
-    outline-offset: -6px;
-  }
-
-  .pb-hero-demo-video:fullscreen,
-  .pb-hero-demo-video:-webkit-full-screen {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: #000000;
-  }
-
   .pb-hero-copy {
     min-width: 0;
     width: 100%;
