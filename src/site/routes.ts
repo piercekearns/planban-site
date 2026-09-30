@@ -316,6 +316,13 @@ function inlineJson(value: unknown): string {
     .replaceAll("&", "\\u0026");
 }
 
+/**
+ * Umami Cloud page-view analytics: cookieless, described on /privacy/.
+ * data-domains limits reporting to planban.ai, so local and preview builds
+ * load the tracker but send nothing.
+ */
+export const umamiScriptTag = `<script defer src="https://cloud.umami.is/script.js" data-website-id="c7a13882-a11d-47fb-ad2c-b923fcb36ddd" data-domains="planban.ai"></script>`;
+
 export function renderRouteHead(route: SiteRoute): string {
   const pageUrl = canonicalUrl(route);
   const tags = [
@@ -341,6 +348,7 @@ export function renderRouteHead(route: SiteRoute): string {
     route.preloadDisplayFont ? `<link rel="preload" href="/assets/fonts/Hellenica-latin.woff2" as="font" type="font/woff2" crossorigin />` : null,
     route.structuredData ? `<script type="application/ld+json">${inlineJson(buildStructuredData())}</script>` : null,
     route.article ? `<script type="application/ld+json">${inlineJson(buildArticleStructuredData(route, route.article))}</script>` : null,
+    umamiScriptTag,
   ];
   return tags.filter((tag): tag is string => tag !== null).join("\n    ");
 }
